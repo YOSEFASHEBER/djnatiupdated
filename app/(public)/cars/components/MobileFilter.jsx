@@ -11,7 +11,7 @@ export default function MobileFilters({
       <div className="bg-white w-80 h-full p-6">
         <button
           onClick={() => setShow(false)}
-          className="mb-6 text-sm text-gray-500"
+          className="mb-6 text-sm text-blue-700"
         >
           Close
         </button>

@@ -89,7 +89,7 @@ export default function CarsClient({ initialData }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-red-50 to-white pt-24">
+    <div className="min-h-screen bg-linear-to-br from-white via-red-50 to-white pt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* ================= HEADER ================= */}
         <header className="text-center mb-10">
@@ -111,7 +111,7 @@ export default function CarsClient({ initialData }) {
         {/* ================= MOBILE FILTER ================= */}
         <div className="md:hidden flex gap-2 mb-5">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-3 w-4 h-4 text-red-400" />
 
             <input
               value={search}
@@ -121,13 +121,13 @@ export default function CarsClient({ initialData }) {
               }}
               placeholder="Search cars..."
               className="w-full pl-9 p-2 border border-slate-300 rounded-xl bg-white shadow-sm
-              placeholder:text-slate-500 text-slate-900"
+              placeholder:text-zinc-700 text-shadow-slate-600"
             />
           </div>
 
           <button
             onClick={() => setShowMobileFilters(!showMobileFilters)}
-            className="p-2 bg-black text-white rounded-xl"
+            className="p-2 bg-black text-white rounded-xl "
           >
             <Filter />
           </button>
@@ -135,7 +135,7 @@ export default function CarsClient({ initialData }) {
 
         {/* ================= MOBILE FILTER PANEL ================= */}
         {showMobileFilters && (
-          <div className="md:hidden bg-white border border-slate-200 rounded-2xl p-4 mb-6 shadow-lg space-y-3">
+          <div className="md:hidden bg-white border border-slate-200 rounded-2xl p-4 mb-6 shadow-lg space-y-3  placeholder:text-zinc-700 text-shadow-slate-600">
             <select
               value={category}
               onChange={(e) => {
@@ -143,7 +143,7 @@ export default function CarsClient({ initialData }) {
                 setCategory(e?.target?.value);
                 setShowMobileFilters(false);
               }}
-              className="w-full p-2 border rounded-xl"
+              className="w-full p-2 border rounded-xl text-slate-600"
             >
               <option value="">All Categories</option>
               <option>SUV</option>
@@ -161,7 +161,7 @@ export default function CarsClient({ initialData }) {
                 setPage(1);
                 setMinPrice(e?.target?.value);
               }}
-              className="w-full p-2 border rounded-xl"
+              className="w-full p-2 border rounded-xl text-zinc-500  placeholder-slate-500"
             />
 
             <input
@@ -172,12 +172,12 @@ export default function CarsClient({ initialData }) {
                 setPage(1);
                 setMaxPrice(e?.target?.value);
               }}
-              className="w-full p-2 border rounded-xl"
+              className="w-full p-2 border rounded-xl text-zinc-500  placeholder-slate-500"
             />
 
             <button
               onClick={resetFilters}
-              className="w-full bg-gray-200 rounded-xl py-2 font-medium"
+              className="w-full bg-red-600 rounded-xl py-2 font-medium text-amber-50 bg-sl "
             >
               Reset Filters
             </button>
@@ -216,10 +216,12 @@ export default function CarsClient({ initialData }) {
                   setPage(1);
                   setCategory(e?.target?.value);
                 }}
-                className="w-full p-2 border border-slate-300 rounded-xl mb-4
-                text-slate-900 focus:ring-2 focus:ring-red-500 outline-none"
+                className="w-full p-2 border border-s-slate-600 rounded-xl mb-4
+                 text-slate-900 focus:ring-2 focus:ring-red-500 outline-none"
               >
-                <option value="">All Categories</option>
+                <option value="" className=" text-slate-900">
+                  All Categories
+                </option>
                 <option>SUV</option>
                 <option>Sedan</option>
                 <option>Hatchback</option>
@@ -236,7 +238,7 @@ export default function CarsClient({ initialData }) {
                     setPage(1);
                     setMinPrice(e.target.value);
                   }}
-                  className="w-full p-2 border border-slate-300 rounded-xl
+                  className="w-full p-2 border border-slate-300 rounded-xl  text-slate-900
                   placeholder:text-slate-500 focus:ring-2 focus:ring-red-500 outline-none"
                 />
 
@@ -248,7 +250,7 @@ export default function CarsClient({ initialData }) {
                     setPage(1);
                     setMaxPrice(e?.target?.value);
                   }}
-                  className="w-full p-2 border border-slate-300 rounded-xl
+                  className="w-full p-2 border border-slate-300 rounded-xl   text-slate-900
                   placeholder:text-slate-500 focus:ring-2 focus:ring-red-500 outline-none"
                 />
               </div>

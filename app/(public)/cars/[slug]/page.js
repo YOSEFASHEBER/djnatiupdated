@@ -97,7 +97,9 @@ export default async function CarDetailPage({ params }) {
 
             {/* DESCRIPTION */}
             <div className="bg-white border rounded-2xl p-5 shadow-sm">
-              <h2 className="text-lg font-bold mb-2">Description</h2>
+              <h2 className="text-lg font-bold mb-2 text-slate-600">
+                Description
+              </h2>
               <p className="text-slate-600 whitespace-pre-line">
                 {car.description || "No description available."}
               </p>
@@ -105,7 +107,9 @@ export default async function CarDetailPage({ params }) {
 
             {/* DETAILS */}
             <div className="bg-white border rounded-2xl p-5 shadow-sm">
-              <h2 className="text-lg font-bold mb-3">Car Details</h2>
+              <h2 className="text-lg font-bold mb-3 text-slate-600">
+                Car Details
+              </h2>
 
               <div className="grid grid-cols-2 gap-y-2 text-sm text-slate-700">
                 <p>

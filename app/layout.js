@@ -1,6 +1,6 @@
-import Footer from "@/components/Footer";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
+import ConditionalNavbar from "@/components/ConditionalNavBar";
+import ConditionalFooter from "@/components/ConditionalFooter";
 
 export const metadata = {
   title: {
@@ -15,11 +15,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="bg-white text-slate-900 antialiased">
-        <Navbar />
+        <ConditionalNavbar />
 
         <main>{children}</main>
 
-        <Footer />
+        <ConditionalFooter />
       </body>
     </html>
   );
