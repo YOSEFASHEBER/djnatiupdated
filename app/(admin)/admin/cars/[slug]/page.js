@@ -621,7 +621,7 @@ export default function EditCarPage({ params }) {
         name="description"
         value={form.description || ""}
         onChange={handleChange}
-        className="input min-h-[120px]"
+        className="input min-h-30"
         placeholder="Description"
       />
 

@@ -6,7 +6,7 @@ import { CarImageGallery } from "../components/CarImageGallery";
 
 // ================= SEO =================
 export async function generateMetadata({ params }) {
-  const { slug } = await params; // ✅ FIX HERE
+  const { slug } = await params;
 
   await connectDB();
 
@@ -34,7 +34,7 @@ export async function generateMetadata({ params }) {
 
 // ================= PAGE =================
 export default async function CarDetailPage({ params }) {
-  const { slug } = await params; // ✅ FIX HERE TOO
+  const { slug } = await params;
 
   await connectDB();
 
@@ -53,9 +53,9 @@ export default async function CarDetailPage({ params }) {
   const whatsappLink = `https://wa.me/${phoneNumber}?text=Hello, I'm interested in the ${car.brand} ${car.name}`;
 
   return (
-    <main className="min-h-screen pt-24 bg-gradient-to-br from-white via-red-50 to-white pb-20">
+    <main className="min-h-screen pt-24 pb-20 bg-slate-50 md:bg-gradient-to-br md:from-white md:via-red-50 md:to-white">
       <div className="max-w-6xl mx-auto px-4">
-        {/* TITLE */}
+        {/* ================= TITLE ================= */}
         <header className="mb-8">
           <h1 className="text-3xl md:text-4xl font-black text-slate-900">
             {car.brand} {car.name}
@@ -66,17 +66,17 @@ export default async function CarDetailPage({ params }) {
           </p>
         </header>
 
-        {/* MAIN */}
-        <div className="grid md:grid-cols-2 gap-10">
-          {/* IMAGE */}
-          <div className="relative h-[420px] rounded-2xl overflow-hidden shadow-lg border">
+        {/* ================= MAIN GRID (FIXED RESPONSIVE + NO WHITE SPACE BUG) ================= */}
+        <div className="grid md:grid-cols-2 gap-10 items-start">
+          {/* ================= IMAGE SECTION ================= */}
+          <div className="bg-white rounded-2xl shadow-lg border p-2 md:sticky md:top-24 self-start">
             <CarImageGallery
               images={car.images}
               name={`${car.brand} ${car.name}`}
             />
           </div>
 
-          {/* INFO */}
+          {/* ================= INFO SECTION ================= */}
           <div className="space-y-6">
             {/* PRICE */}
             <div>
@@ -100,7 +100,7 @@ export default async function CarDetailPage({ params }) {
               <h2 className="text-lg font-bold mb-2 text-slate-600">
                 Description
               </h2>
-              <p className="text-slate-600 whitespace-pre-line">
+              <p className="text-slate-600 whitespace-pre-line leading-relaxed">
                 {car.description || "No description available."}
               </p>
             </div>
@@ -153,9 +153,11 @@ export default async function CarDetailPage({ params }) {
           </div>
         </div>
 
-        {/* RELATED */}
+        {/* ================= RELATED CARS ================= */}
         <section className="mt-14">
-          <h2 className="text-xl font-bold mb-4">Related Cars</h2>
+          <h2 className="text-xl font-bold mb-4 text-slate-600">
+            Related Cars
+          </h2>
 
           <div className="grid md:grid-cols-3 gap-5">
             {relatedCars.map((c) => (
@@ -174,7 +176,7 @@ export default async function CarDetailPage({ params }) {
                 </div>
 
                 <div className="p-3">
-                  <p className="font-semibold">
+                  <p className="font-semibold text-slate-600">
                     {c.brand} {c.name}
                   </p>
 

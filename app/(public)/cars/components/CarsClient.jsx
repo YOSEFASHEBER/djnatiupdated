@@ -25,7 +25,15 @@ export default function CarsClient({ initialData }) {
   const debouncedSearch = useDebounce(search, 500);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
-  // ================= QUERY BUILDER =================
+  // ================= PRICE FORMAT HELPERS =================
+  const formatNumber = (value) => {
+    if (!value) return "";
+    return new Intl.NumberFormat("en-US").format(value);
+  };
+
+  const parseNumber = (value) => value.replace(/,/g, "");
+
+  // ================= QUERY =================
   const queryString = useMemo(() => {
     const params = new URLSearchParams();
 
@@ -34,8 +42,8 @@ export default function CarsClient({ initialData }) {
 
     if (debouncedSearch) params.set("search", debouncedSearch);
     if (category) params.set("category", category);
-    if (minPrice) params.set("minPrice", minPrice);
-    if (maxPrice) params.set("maxPrice", maxPrice);
+    if (minPrice) params.set("minPrice", parseNumber(minPrice));
+    if (maxPrice) params.set("maxPrice", parseNumber(maxPrice));
 
     return params.toString();
   }, [page, limit, debouncedSearch, category, minPrice, maxPrice]);
@@ -56,8 +64,6 @@ export default function CarsClient({ initialData }) {
           setCars(data?.data);
           setTotalPages(data?.pagination?.totalPages);
         }
-      } catch (err) {
-        console.error("Fetch error:", err);
       } finally {
         setLoading(false);
       }
@@ -66,20 +72,18 @@ export default function CarsClient({ initialData }) {
     fetchCars();
   }, [queryString]);
 
-  // ================= PAGINATION RANGE =================
+  // ================= PAGINATION =================
   const pages = useMemo(() => {
     const range = [];
     const start = Math.max(1, page - 2);
     const end = Math.min(totalPages, page + 2);
 
-    for (let i = start; i <= end; i++) {
-      range.push(i);
-    }
+    for (let i = start; i <= end; i++) range.push(i);
 
     return range;
   }, [page, totalPages]);
 
-  // ================= RESET FILTERS =================
+  // ================= RESET =================
   const resetFilters = () => {
     setSearch("");
     setCategory("");
@@ -117,33 +121,40 @@ export default function CarsClient({ initialData }) {
               value={search}
               onChange={(e) => {
                 setPage(1);
-                setSearch(e?.target?.value);
+                setSearch(e.target.value);
               }}
               placeholder="Search cars..."
-              className="w-full pl-9 p-2 border border-slate-300 rounded-xl bg-white shadow-sm
-              placeholder:text-zinc-700 text-shadow-slate-600"
+              className="w-full pl-9 p-2 border rounded-xl bg-white shadow-sm
+              transition-all duration-200 focus:ring-2 focus:ring-red-500 outline-none text-slate-600"
             />
           </div>
 
           <button
             onClick={() => setShowMobileFilters(!showMobileFilters)}
-            className="p-2 bg-black text-white rounded-xl "
+            className="p-2 bg-black text-white rounded-xl transition-all duration-200 active:scale-95 hover:scale-105"
           >
             <Filter />
           </button>
         </div>
 
-        {/* ================= MOBILE FILTER PANEL ================= */}
-        {showMobileFilters && (
-          <div className="md:hidden bg-white border border-slate-200 rounded-2xl p-4 mb-6 shadow-lg space-y-3  placeholder:text-zinc-700 text-shadow-slate-600">
+        {/* ================= MOBILE FILTER PANEL (SMOOTH) ================= */}
+        <div
+          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out 
+          ${
+            showMobileFilters
+              ? "max-h-[500px] opacity-100 translate-y-0 mb-6"
+              : "max-h-0 opacity-0 -translate-y-2 mb-0"
+          }`}
+        >
+          <div className="bg-white border rounded-2xl p-4 shadow-lg space-y-3">
             <select
               value={category}
               onChange={(e) => {
                 setPage(1);
-                setCategory(e?.target?.value);
+                setCategory(e.target.value);
                 setShowMobileFilters(false);
               }}
-              className="w-full p-2 border rounded-xl text-slate-600"
+              className="w-full p-2 border rounded-xl transition-all duration-200 focus:ring-2 focus:ring-red-500 outline-none text-slate-600"
             >
               <option value="">All Categories</option>
               <option>SUV</option>
@@ -154,46 +165,54 @@ export default function CarsClient({ initialData }) {
             </select>
 
             <input
-              type="number"
+              type="text"
+              inputMode="numeric"
               placeholder="Min Price"
               value={minPrice}
               onChange={(e) => {
+                const raw = parseNumber(e.target.value);
+                if (!/^\d*$/.test(raw)) return;
+
                 setPage(1);
-                setMinPrice(e?.target?.value);
+                setMinPrice(formatNumber(raw));
               }}
-              className="w-full p-2 border rounded-xl text-zinc-500  placeholder-slate-500"
+              className="w-full p-2 border rounded-xl transition-all duration-200 focus:ring-2 focus:ring-red-500 outline-none text-slate-600"
             />
 
             <input
-              type="number"
+              type="text"
+              inputMode="numeric"
               placeholder="Max Price"
               value={maxPrice}
               onChange={(e) => {
+                const raw = parseNumber(e.target.value);
+                if (!/^\d*$/.test(raw)) return;
+
                 setPage(1);
-                setMaxPrice(e?.target?.value);
+                setMaxPrice(formatNumber(raw));
               }}
-              className="w-full p-2 border rounded-xl text-zinc-500  placeholder-slate-500"
+              className="w-full p-2 border rounded-xl transition-all duration-200 focus:ring-2 focus:ring-red-500 outline-none text-slate-600"
             />
 
             <button
               onClick={resetFilters}
-              className="w-full bg-red-600 rounded-xl py-2 font-medium text-amber-50 bg-sl "
+              className="w-full bg-red-600 rounded-xl py-2 font-medium text-white transition-all duration-200 hover:bg-red-700 active:scale-95"
             >
               Reset Filters
             </button>
           </div>
-        )}
+        </div>
 
         <div className="flex gap-8">
           {/* ================= SIDEBAR ================= */}
           <aside className="hidden md:block w-80">
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-md sticky top-28">
+            <div className="bg-white border rounded-3xl p-6 shadow-md sticky top-28 transition-all duration-300 hover:shadow-lg ">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-bold text-slate-900">Filters</h2>
+                <h2 className="text-lg font-bold text-slate-600">Filters</h2>
 
                 <button
                   onClick={resetFilters}
-                  className="text-sm text-red-500 hover:text-red-600"
+                  className="text-sm text-red-500 hover:text-red-600 transition"
                 >
                   Reset
                 </button>
@@ -203,25 +222,21 @@ export default function CarsClient({ initialData }) {
                 value={search}
                 onChange={(e) => {
                   setPage(1);
-                  setSearch(e?.target?.value);
+                  setSearch(e.target.value);
                 }}
                 placeholder="Search cars..."
-                className="w-full p-2 border border-slate-300 rounded-xl mb-4
-                placeholder:text-slate-500 text-slate-900 focus:ring-2 focus:ring-red-500 outline-none"
+                className="w-full p-2 border rounded-xl mb-4 transition-all duration-200 focus:ring-2 focus:ring-red-500 outline-none text-slate-600"
               />
 
               <select
                 value={category}
                 onChange={(e) => {
                   setPage(1);
-                  setCategory(e?.target?.value);
+                  setCategory(e.target.value);
                 }}
-                className="w-full p-2 border border-s-slate-600 rounded-xl mb-4
-                 text-slate-900 focus:ring-2 focus:ring-red-500 outline-none"
+                className="w-full p-2 border rounded-xl mb-4 transition-all duration-200 focus:ring-2 focus:ring-red-500 outline-none text-slate-600"
               >
-                <option value="" className=" text-slate-900">
-                  All Categories
-                </option>
+                <option value="">All Categories</option>
                 <option>SUV</option>
                 <option>Sedan</option>
                 <option>Hatchback</option>
@@ -229,31 +244,35 @@ export default function CarsClient({ initialData }) {
                 <option>Van</option>
               </select>
 
-              <div className="grid grid-cols-2 gap-3">
-                <input
-                  type="number"
-                  placeholder="Min"
-                  value={minPrice}
-                  onChange={(e) => {
-                    setPage(1);
-                    setMinPrice(e.target.value);
-                  }}
-                  className="w-full p-2 border border-slate-300 rounded-xl  text-slate-900
-                  placeholder:text-slate-500 focus:ring-2 focus:ring-red-500 outline-none"
-                />
+              <input
+                type="text"
+                inputMode="numeric"
+                placeholder="Min"
+                value={minPrice}
+                onChange={(e) => {
+                  const raw = parseNumber(e.target.value);
+                  if (!/^\d*$/.test(raw)) return;
 
-                <input
-                  type="number"
-                  placeholder="Max"
-                  value={maxPrice}
-                  onChange={(e) => {
-                    setPage(1);
-                    setMaxPrice(e?.target?.value);
-                  }}
-                  className="w-full p-2 border border-slate-300 rounded-xl   text-slate-900
-                  placeholder:text-slate-500 focus:ring-2 focus:ring-red-500 outline-none"
-                />
-              </div>
+                  setPage(1);
+                  setMinPrice(formatNumber(raw));
+                }}
+                className="w-full p-2 border rounded-xl mb-3 transition-all duration-200 focus:ring-2 focus:ring-red-500 outline-none text-slate-600"
+              />
+
+              <input
+                type="text"
+                inputMode="numeric"
+                placeholder="Max"
+                value={maxPrice}
+                onChange={(e) => {
+                  const raw = parseNumber(e.target.value);
+                  if (!/^\d*$/.test(raw)) return;
+
+                  setPage(1);
+                  setMaxPrice(formatNumber(raw));
+                }}
+                className="w-full p-2 border rounded-xl transition-all duration-200 focus:ring-2 focus:ring-red-500 outline-none text-slate-600"
+              />
             </div>
           </aside>
 
@@ -266,9 +285,9 @@ export default function CarsClient({ initialData }) {
                 ))}
               </div>
             ) : (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 transition-opacity duration-300">
                 {cars.map((car) => (
-                  <CarCard key={car?._id} car={car} />
+                  <CarCard key={car._id} car={car} />
                 ))}
               </div>
             )}
@@ -277,7 +296,7 @@ export default function CarsClient({ initialData }) {
             <div className="flex justify-center mt-12 gap-2 flex-wrap">
               <button
                 onClick={() => setPage((p) => Math.max(p - 1, 1))}
-                className="px-3 py-2 bg-white border rounded-xl hover:bg-gray-100"
+                className="px-3 py-2 bg-white border rounded-xl transition hover:scale-105 active:scale-95"
               >
                 <ArrowLeft />
               </button>
@@ -286,10 +305,10 @@ export default function CarsClient({ initialData }) {
                 <button
                   key={num}
                   onClick={() => setPage(num)}
-                  className={`px-3 py-2 border rounded-xl transition ${
+                  className={`px-3 py-2 border rounded-xl transition-all duration-200 ${
                     page === num
-                      ? "bg-red-600 text-white shadow-md"
-                      : "bg-white hover:bg-gray-100"
+                      ? "bg-red-600 text-white"
+                      : "bg-white hover:scale-105"
                   }`}
                 >
                   {num}
@@ -298,7 +317,7 @@ export default function CarsClient({ initialData }) {
 
               <button
                 onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-                className="px-3 py-2 bg-white border rounded-xl hover:bg-gray-100"
+                className="px-3 py-2 bg-white border rounded-xl transition hover:scale-105 active:scale-95"
               >
                 <ArrowRight />
               </button>

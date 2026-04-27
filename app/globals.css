@@ -19,6 +19,14 @@
   }
 }
 
+/* Hide navbar when gallery fullscreen is active (desktop only) */
+@media (min-width: 1024px) {
+  body.fullscreen-gallery header,
+  body.fullscreen-gallery nav {
+    display: none !important;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
