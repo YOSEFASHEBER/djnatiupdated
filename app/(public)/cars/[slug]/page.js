@@ -436,17 +436,7 @@
 //     console.error("Car page error:", error);
 
 //     return (
-//       <main className="min-h-screen flex items-center justify-center">
-//         <div className="text-center p-6 bg-red-50 border border-red-200 rounded-xl">
-//           <h2 className="text-xl font-bold text-red-600">
-//             Something went wrong
-//           </h2>
-//           <p className="text-sm text-red-500 mt-2">Please try again later.</p>
-//         </div>
-//       </main>
-//     );
-//   }
-// }
+
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { connectDB } from "@/lib/mongodb";
@@ -509,7 +499,7 @@ export default async function CarDetailPage({ params }) {
       .limit(3)
       .lean();
 
-    const phoneNumber = "+251912345678";
+    const phoneNumber = "+251923708473";
     const whatsappLink = `https://wa.me/${phoneNumber}?text=Hello, I'm interested in the ${car.brand} ${car.name}`;
 
     return (
