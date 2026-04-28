@@ -30,8 +30,8 @@ export default function AdminLoginPage() {
       if (!res.ok) {
         throw new Error(data.error || "Login failed");
       }
-
       router.push("/admin");
+      router.refresh();
     } catch (err) {
       setError(err.message);
     } finally {
