@@ -21,7 +21,7 @@
 //   const hasMultiple = safeImages.length > 1;
 //   const currentImage = safeImages[index]?.url || "/placeholder.png";
 
-//   // NAVIGATION
+//   // ================= NAVIGATION =================
 //   const prev = () => {
 //     setIndex((i) => (i === 0 ? safeImages.length - 1 : i - 1));
 //   };
@@ -30,7 +30,7 @@
 //     setIndex((i) => (i === safeImages.length - 1 ? 0 : i + 1));
 //   };
 
-//   // TOUCH SWIPE
+//   // ================= TOUCH SWIPE =================
 //   const onTouchStart = (e) => {
 //     setTouchEnd(null);
 //     setTouchStart(e.targetTouches[0].clientX);
@@ -49,7 +49,7 @@
 //     if (distance < -minSwipeDistance) prev();
 //   };
 
-//   // KEYBOARD NAVIGATION
+//   // ================= KEYBOARD NAVIGATION =================
 //   useEffect(() => {
 //     if (!fullscreen) return;
 
@@ -63,9 +63,20 @@
 //     return () => window.removeEventListener("keydown", handleKey);
 //   }, [fullscreen]);
 
-//   // LOCK SCROLL
+//   // ================= LOCK BODY SCROLL + HIDE NAVBAR =================
 //   useEffect(() => {
-//     document.body.style.overflow = fullscreen ? "hidden" : "auto";
+//     if (fullscreen) {
+//       document.body.style.overflow = "hidden";
+//       document.body.classList.add("fullscreen-gallery");
+//     } else {
+//       document.body.style.overflow = "auto";
+//       document.body.classList.remove("fullscreen-gallery");
+//     }
+
+//     return () => {
+//       document.body.style.overflow = "auto";
+//       document.body.classList.remove("fullscreen-gallery");
+//     };
 //   }, [fullscreen]);
 
 //   useEffect(() => {
@@ -74,7 +85,7 @@
 
 //   return (
 //     <>
-//       {/* MAIN IMAGE */}
+//       {/* ================= MAIN IMAGE ================= */}
 //       <div className="space-y-3">
 //         <div
 //           className="relative rounded-xl sm:rounded-2xl overflow-hidden border shadow-md bg-white cursor-zoom-in group"
@@ -94,6 +105,7 @@
 //             className="w-full h-[240px] sm:h-[320px] md:h-[420px] object-cover transition-transform duration-300 group-hover:scale-105"
 //           />
 
+//           {/* NAV BUTTONS */}
 //           {hasMultiple && (
 //             <div className="absolute inset-0 flex items-center justify-between px-3 opacity-0 group-hover:opacity-100 transition">
 //               <button
@@ -119,7 +131,7 @@
 //           )}
 //         </div>
 
-//         {/* THUMBNAILS */}
+//         {/* ================= THUMBNAILS ================= */}
 //         {hasMultiple && (
 //           <div>
 //             <p className="text-xs sm:text-sm font-semibold text-slate-600 mb-2">
@@ -158,23 +170,8 @@
 //         )}
 //       </div>
 
-//       {/* FULLSCREEN VIEW */}
+//       {/* ================= FULLSCREEN VIEW ================= */}
 //       {fullscreen && (
-//         // LOCK BODY SCROLL + CONTROL NAVBAR
-// useEffect(() => {
-//   if (fullscreen) {
-//     document.body.style.overflow = "hidden";
-//     document.body.classList.add("fullscreen-gallery");
-//   } else {
-//     document.body.style.overflow = "auto";
-//     document.body.classList.remove("fullscreen-gallery");
-//   }
-
-//   return () => {
-//     document.body.style.overflow = "auto";
-//     document.body.classList.remove("fullscreen-gallery");
-//   };
-// }, [fullscreen])
 //         <div
 //           className="fixed inset-0 bg-black/95 z-40 flex items-center justify-center"
 //           onClick={() => setFullscreen(false)}
@@ -237,7 +234,6 @@
 //     </>
 //   );
 // }
-
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -246,7 +242,7 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
 export function CarImageGallery({ images = [], name = "car" }) {
   const safeImages = useMemo(
-    () => images?.filter((img) => img?.url) || [],
+    () => (Array.isArray(images) ? images.filter((img) => img?.url) : []),
     [images],
   );
 
@@ -259,25 +255,38 @@ export function CarImageGallery({ images = [], name = "car" }) {
   const minSwipeDistance = 50;
 
   const hasMultiple = safeImages.length > 1;
-  const currentImage = safeImages[index]?.url || "/placeholder.png";
+
+  const currentImage =
+    safeImages.length > 0 ? safeImages[index]?.url : "/placeholder.png";
+
+  // ================= SAFETY: prevent invalid index =================
+  useEffect(() => {
+    if (index >= safeImages.length) {
+      setIndex(0);
+    }
+  }, [safeImages.length, index]);
 
   // ================= NAVIGATION =================
   const prev = () => {
+    if (!safeImages.length) return;
+
     setIndex((i) => (i === 0 ? safeImages.length - 1 : i - 1));
   };
 
   const next = () => {
+    if (!safeImages.length) return;
+
     setIndex((i) => (i === safeImages.length - 1 ? 0 : i + 1));
   };
 
   // ================= TOUCH SWIPE =================
   const onTouchStart = (e) => {
     setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
+    setTouchStart(e?.targetTouches?.[0]?.clientX ?? null);
   };
 
   const onTouchMove = (e) => {
-    setTouchEnd(e.targetTouches[0].clientX);
+    setTouchEnd(e?.targetTouches?.[0]?.clientX ?? null);
   };
 
   const onTouchEnd = () => {
@@ -301,10 +310,12 @@ export function CarImageGallery({ images = [], name = "car" }) {
 
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [fullscreen]);
+  }, [fullscreen, safeImages.length]);
 
-  // ================= LOCK BODY SCROLL + HIDE NAVBAR =================
+  // ================= BODY SCROLL LOCK =================
   useEffect(() => {
+    if (typeof document === "undefined") return;
+
     if (fullscreen) {
       document.body.style.overflow = "hidden";
       document.body.classList.add("fullscreen-gallery");
@@ -390,7 +401,7 @@ export function CarImageGallery({ images = [], name = "car" }) {
                   }`}
                 >
                   <Image
-                    src={img.url}
+                    src={img?.url || "/placeholder.png"}
                     alt={`${name} thumbnail ${i + 1}`}
                     width={100}
                     height={70}

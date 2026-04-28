@@ -48,6 +48,28 @@ export default function CarsClient({ initialData }) {
     return params.toString();
   }, [page, limit, debouncedSearch, category, fuelType, minPrice, maxPrice]);
 
+  // useEffect(() => {
+  //   const fetchCars = async () => {
+  //     try {
+  //       setLoading(true);
+
+  //       const res = await fetch(`/api/cars?${queryString}`, {
+  //         cache: "no-store",
+  //       });
+
+  //       const data = await res.json();
+
+  //       if (data?.success) {
+  //         setCars(data?.data);
+  //         setTotalPages(data?.pagination?.totalPages);
+  //       }
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchCars();
+  // }, [queryString]);
   useEffect(() => {
     const fetchCars = async () => {
       try {
@@ -57,12 +79,29 @@ export default function CarsClient({ initialData }) {
           cache: "no-store",
         });
 
-        const data = await res.json();
-
-        if (data?.success) {
-          setCars(data?.data);
-          setTotalPages(data?.pagination?.totalPages);
+        if (!res.ok) {
+          throw new Error("Failed request");
         }
+
+        let data;
+        try {
+          data = await res.json();
+        } catch {
+          throw new Error("Invalid JSON response");
+        }
+
+        if (!data || data.success === false) {
+          throw new Error("API returned error");
+        }
+
+        setCars(Array.isArray(data?.data) ? data.data : []);
+        setTotalPages(Number(data?.pagination?.totalPages || 1));
+      } catch (err) {
+        console.error("Cars fetch error:", err);
+
+        // SAFE fallback (no UI change, just prevent crash)
+        setCars([]);
+        setTotalPages(1);
       } finally {
         setLoading(false);
       }
