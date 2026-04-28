@@ -201,10 +201,10 @@ export default function CarsClient({ initialData }) {
               className="w-full p-2 border rounded-xl focus:ring-2 focus:ring-red-500 outline-none text-slate-600"
             >
               <option value="">All Fuel Types</option>
-              <option value="petrol">Petrol</option>
-              <option value="diesel">Diesel</option>
-              <option value="electric">Electric</option>
-              <option value="hybrid">Hybrid</option>
+              <option value="Petrol">Petrol</option>
+              <option value="Diesel">Diesel</option>
+              <option value="Electric">Electric</option>
+              <option value="Hybrid">Hybrid</option>
             </select>
 
             <input
