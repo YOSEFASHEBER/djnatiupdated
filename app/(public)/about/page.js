@@ -118,7 +118,7 @@ export default function AboutPage() {
 
               <div className="relative rounded-3xl overflow-hidden border shadow-2xl">
                 <Image
-                  src="/images/about-showroom.jpg"
+                  src="https://res.cloudinary.com/dznmeumqb/image/upload/v1777468684/showroomimageweb_rimlik.png"
                   alt="DJ Nati Cars showroom in Addis Ababa Ethiopia"
                   width={900}
                   height={700}
