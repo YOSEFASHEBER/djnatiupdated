@@ -341,7 +341,7 @@ export default function CarsClient({ initialData }) {
               </div>
             )}
 
-            <div className="flex justify-center mt-12 gap-2 flex-wrap">
+            {/* <div className="flex justify-center mt-12 gap-2 flex-wrap text-slate-700 bp">
               <button
                 onClick={() => setPage((p) => Math.max(p - 1, 1))}
                 className="px-3 py-2 bg-white border rounded-xl"
@@ -365,6 +365,42 @@ export default function CarsClient({ initialData }) {
               >
                 <ArrowRight />
               </button>
+            </div> */}
+            <div className="flex justify-center mt-12">
+              <div className="flex items-center gap-3  px-4 py-3   ">
+                {/* Prev */}
+                <button
+                  onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                  className="p-2 rounded-lg border hover:bg-gray-100 transition"
+                >
+                  <ArrowLeft className="text-slate-800" size={18} />
+                </button>
+
+                {/* Pages */}
+                <div className="flex items-center gap-2 px-2">
+                  {pages.map((num) => (
+                    <button
+                      key={num}
+                      onClick={() => setPage(num)}
+                      className={`px-4 py-2 rounded-lg font-medium transition ${
+                        page === num
+                          ? "bg-red-600 text-white shadow"
+                          : "bg-gray-100 hover:bg-gray-200 text-slate-700"
+                      }`}
+                    >
+                      {num}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Next */}
+                <button
+                  onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+                  className="p-2 rounded-lg border hover:bg-gray-100 transition"
+                >
+                  <ArrowRight className="text-slate-800" size={18} />
+                </button>
+              </div>
             </div>
           </main>
         </div>

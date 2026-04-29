@@ -5,69 +5,135 @@ import cloudinary from "@/lib/cloudinary";
 
 // ================= GET CAR =================
 export async function GET(req, context) {
-  const params = await context.params; // ✅ FIX
-
-  console.log("📦 Params:", params);
-  console.log("🔍 Slug:", params.slug);
+  const params = await context.params;
+  const slug = params.slug;
 
   await connectDB();
-  console.log("✅ DB Connected");
 
   try {
-    console.log("🔍 Searching car with slug:", params.slug);
-
-    const car = await Car.findOne({ slug: params?.slug });
-
-    console.log("📄 DB RESULT:", car ? "FOUND" : "NOT FOUND");
+    const car = await Car.findOne({ slug });
 
     if (!car) {
-      console.log("❌ Car not found in DB");
-      return Response.json({ error: "Car not found" }, { status: 404 });
+      return Response.json(
+        { success: false, error: "Car not found" },
+        { status: 404 },
+      );
     }
 
-    console.log("✅ Car found:", car.name);
-
-    return Response.json({ success: true, data: car });
+    return Response.json({
+      success: true,
+      data: car,
+    });
   } catch (error) {
-    console.log("💥 GET ERROR:", error.message);
-
-    return Response.json({ error: error.message }, { status: 500 });
+    return Response.json(
+      { success: false, error: error.message },
+      { status: 500 },
+    );
   }
 }
 
 // ================= UPDATE CAR =================
 export async function PUT(req, context) {
   const params = await context.params;
-  console.log("✏️ [PUT] UPDATE HIT");
-  console.log("📦 Slug:", params.slug);
+  const slug = params.slug;
 
   await connectDB();
 
   try {
     const body = await req.json();
-    console.log("📥 BODY RECEIVED:", body);
 
-    const car = await Car.findOne({ slug: params.slug });
-
-    console.log("🔍 CAR FOUND:", !!car);
+    const car = await Car.findOne({ slug });
 
     if (!car) {
-      console.log("❌ Car not found for update");
-      return Response.json({ error: "Car not found" }, { status: 404 });
+      return Response.json(
+        { success: false, error: "Car not found" },
+        { status: 404 },
+      );
     }
 
-    // update fields
-    if (body.name) car.name = body.name;
-    if (body.brand) car.brand = body.brand;
-    if (body.year) car.year = Number(body.year);
-    if (body.price) car.price = Number(body.price);
-    if (body.description) car.description = body.description;
-    if (body.status) car.status = body.status;
-    if (body.images) car.images = body.images;
+    // ================= VALIDATION =================
+    const errors = {};
 
-    console.log("🛠️ Updated fields applied");
+    const isEmpty = (val) => !val || val.toString().trim() === "";
 
-    // regenerate slug
+    if ("name" in body && isEmpty(body.name)) {
+      errors.name = "Car name is required";
+    }
+
+    if ("brand" in body && isEmpty(body.brand)) {
+      errors.brand = "Brand is required";
+    }
+
+    if ("price" in body) {
+      const price = Number(body.price);
+      if (isNaN(price) || price <= 0) {
+        errors.price = "Price must be a valid number";
+      }
+    }
+
+    if ("year" in body) {
+      const year = Number(body.year);
+      const currentYear = new Date().getFullYear();
+
+      if (isNaN(year) || year < 1900 || year > currentYear + 1) {
+        errors.year = "Year is invalid";
+      }
+    }
+
+    if (
+      "status" in body &&
+      !["Available", "Sold", "Reserved"].includes(body.status)
+    ) {
+      errors.status = "Invalid status value";
+    }
+
+    if ("images" in body) {
+      if (!Array.isArray(body.images) || body.images.length === 0) {
+        errors.images = "At least one image is required";
+      } else {
+        const invalid = body.images.some((img) => !img?.url || !img?.public_id);
+
+        if (invalid) {
+          errors.images = "Each image must have url and public_id";
+        }
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return Response.json(
+        {
+          success: false,
+          message: "Validation failed",
+          errors,
+        },
+        { status: 400 },
+      );
+    }
+
+    // ================= UPDATE FIELDS =================
+    const fields = [
+      "name",
+      "brand",
+      "year",
+      "price",
+      "description",
+      "status",
+      "fuelType",
+      "transmission",
+      "category",
+      "images",
+    ];
+
+    fields.forEach((field) => {
+      if (field in body) {
+        car[field] =
+          field === "price" || field === "year"
+            ? Number(body[field])
+            : body[field];
+      }
+    });
+
+    // ================= SLUG UPDATE =================
     if (body.name || body.brand || body.year) {
       const baseSlug = slugify(`${car.brand}-${car.name}-${car.year}`, {
         lower: true,
@@ -75,60 +141,56 @@ export async function PUT(req, context) {
       });
 
       car.slug = `${baseSlug}-${Date.now().toString().slice(-4)}`;
-
-      console.log("🔗 NEW SLUG GENERATED:", car.slug);
     }
 
     await car.save();
 
-    console.log("💾 Car saved successfully");
-
-    return Response.json({ success: true, data: car });
+    return Response.json({
+      success: true,
+      data: car,
+    });
   } catch (error) {
-    console.log("💥 UPDATE ERROR:", error.message);
-
-    return Response.json({ error: error.message }, { status: 500 });
+    return Response.json(
+      { success: false, error: error.message },
+      { status: 500 },
+    );
   }
 }
 
 // ================= DELETE CAR =================
 export async function DELETE(req, context) {
   const params = await context.params;
-  console.log("🗑️ [DELETE] HIT");
-  console.log("📦 Slug:", params.slug);
+  const slug = params.slug;
 
   await connectDB();
 
   try {
-    const car = await Car.findOne({ slug: params.slug });
-
-    console.log("🔍 CAR FOUND:", !!car);
+    const car = await Car.findOne({ slug });
 
     if (!car) {
-      console.log("❌ Car not found for delete");
-      return Response.json({ error: "Car not found" }, { status: 404 });
-    }
-
-    // delete cloudinary images
-    if (car.images?.length) {
-      console.log("☁️ Deleting images from Cloudinary...");
-
-      await Promise.all(
-        car.images.map((img) => {
-          console.log("🗑️ Deleting:", img.public_id);
-          return cloudinary.uploader.destroy(img.public_id);
-        }),
+      return Response.json(
+        { success: false, error: "Car not found" },
+        { status: 404 },
       );
     }
 
-    await Car.deleteOne({ slug: params.slug });
+    // delete images from cloudinary
+    if (car.images?.length) {
+      await Promise.all(
+        car.images.map((img) => cloudinary.uploader.destroy(img.public_id)),
+      );
+    }
 
-    console.log("✅ Car deleted from DB");
+    await Car.deleteOne({ slug });
 
-    return Response.json({ success: true });
+    return Response.json({
+      success: true,
+      message: "Car deleted successfully",
+    });
   } catch (error) {
-    console.log("💥 DELETE ERROR:", error.message);
-
-    return Response.json({ error: error.message }, { status: 500 });
+    return Response.json(
+      { success: false, error: error.message },
+      { status: 500 },
+    );
   }
 }

@@ -1,6 +1,7 @@
 import { connectDB } from "@/lib/mongodb";
 import Car from "@/models/Car";
 import slugify from "slugify";
+import { revalidatePath } from "next/cache";
 
 const STATUS_ENUM = ["Available", "Sold", "Reserved"];
 
@@ -51,6 +52,113 @@ export async function GET(req) {
 }
 
 // ================= CREATE CAR (ADMIN) =================
+// export async function POST(req) {
+//   try {
+//     await connectDB();
+
+//     const body = await req.json();
+
+//     const newCar = {
+//       name: sanitize(body.name),
+//       brand: sanitize(body.brand),
+//       category: sanitize(body.category),
+//       price: Number(body.price),
+//       year: Number(body.year),
+//       fuelType: sanitize(body.fuelType),
+//       transmission: sanitize(body.transmission),
+//       mileage: body.mileage ? Number(body.mileage) : undefined,
+//       description: body.description ? sanitize(body.description) : "",
+//       status: sanitize(body.status || "Available"),
+//       images: Array.isArray(body.images) ? body.images : [],
+//     };
+
+//     // ================= VALIDATION =================
+//     const requiredFields = [
+//       "name",
+//       "brand",
+//       "category",
+//       "price",
+//       "year",
+//       "fuelType",
+//       "transmission",
+//     ];
+
+//     for (const field of requiredFields) {
+//       if (!newCar[field]) {
+//         return Response.json(
+//           { success: false, error: `${field} is required` },
+//           { status: 400 },
+//         );
+//       }
+//     }
+
+//     if (isNaN(newCar.price)) {
+//       return Response.json(
+//         { success: false, error: "Valid price required" },
+//         { status: 400 },
+//       );
+//     }
+
+//     if (isNaN(newCar.year)) {
+//       return Response.json(
+//         { success: false, error: "Valid year required" },
+//         { status: 400 },
+//       );
+//     }
+
+//     if (!STATUS_ENUM.includes(newCar.status)) {
+//       return Response.json(
+//         { success: false, error: "Invalid status" },
+//         { status: 400 },
+//       );
+//     }
+
+//     const isValidImages =
+//       Array.isArray(newCar.images) &&
+//       newCar.images.length > 0 &&
+//       newCar.images.every((img) => img?.url && img?.public_id);
+
+//     if (!isValidImages) {
+//       return Response.json(
+//         {
+//           success: false,
+//           error: "Images must include url and public_id",
+//         },
+//         { status: 400 },
+//       );
+//     }
+
+//     // ================= SLUG GENERATION =================
+//     const baseSlug = slugify(`${newCar.brand} ${newCar.name} ${newCar.year}`, {
+//       lower: true,
+//       strict: true,
+//     });
+
+//     const uniqueId = Date.now().toString().slice(-5);
+//     newCar.slug = `${baseSlug}-${uniqueId}`;
+
+//     // ================= CREATE CAR =================
+//     const car = await Car.create(newCar);
+//     // ✅ refresh homepage cache
+//     revalidatePath("/");
+
+//     return Response.json({
+//       success: true,
+//       data: car,
+//     });
+//   } catch (error) {
+//     console.error("POST /admin/cars error:", error);
+
+//     return Response.json(
+//       {
+//         success: false,
+//         error: "Failed to create car",
+//       },
+//       { status: 500 },
+//     );
+//   }
+// }
+
 export async function POST(req) {
   try {
     await connectDB();
@@ -71,7 +179,9 @@ export async function POST(req) {
       images: Array.isArray(body.images) ? body.images : [],
     };
 
-    // ================= VALIDATION =================
+    // ================= VALIDATION (IMPROVED) =================
+    const errors = {};
+
     const requiredFields = [
       "name",
       "brand",
@@ -84,32 +194,20 @@ export async function POST(req) {
 
     for (const field of requiredFields) {
       if (!newCar[field]) {
-        return Response.json(
-          { success: false, error: `${field} is required` },
-          { status: 400 },
-        );
+        errors[field] = `${field} is required`;
       }
     }
 
     if (isNaN(newCar.price)) {
-      return Response.json(
-        { success: false, error: "Valid price required" },
-        { status: 400 },
-      );
+      errors.price = "Valid price required";
     }
 
     if (isNaN(newCar.year)) {
-      return Response.json(
-        { success: false, error: "Valid year required" },
-        { status: 400 },
-      );
+      errors.year = "Valid year required";
     }
 
     if (!STATUS_ENUM.includes(newCar.status)) {
-      return Response.json(
-        { success: false, error: "Invalid status" },
-        { status: 400 },
-      );
+      errors.status = "Invalid status selected";
     }
 
     const isValidImages =
@@ -118,10 +216,15 @@ export async function POST(req) {
       newCar.images.every((img) => img?.url && img?.public_id);
 
     if (!isValidImages) {
+      errors.images = "At least one valid image is required";
+    }
+
+    // ❌ RETURN ALL ERRORS TOGETHER
+    if (Object.keys(errors).length > 0) {
       return Response.json(
         {
           success: false,
-          error: "Images must include url and public_id",
+          errors,
         },
         { status: 400 },
       );
@@ -138,6 +241,9 @@ export async function POST(req) {
 
     // ================= CREATE CAR =================
     const car = await Car.create(newCar);
+
+    // ✅ refresh homepage cache
+    revalidatePath("/");
 
     return Response.json({
       success: true,

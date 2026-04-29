@@ -3,6 +3,8 @@ import LatestCars from "@/components/ui/LatestCars";
 import { connectDB } from "@/lib/mongodb";
 import Car from "@/models/Car";
 
+export const revalidate = 60;
+
 export const metadata = {
   title: "DJ Nati Cars | Buy Cars in Ethiopia",
   description:
@@ -14,7 +16,21 @@ async function getLatestCars() {
   try {
     await connectDB();
 
-    const cars = await Car.find({}).sort({ createdAt: -1 }).limit(6).lean();
+    const cars = await Car.find(
+      {},
+      {
+        name: 1,
+        brand: 1,
+        price: 1,
+        images: 1,
+        slug: 1,
+        year: 1,
+        status: 1,
+      },
+    )
+      .sort({ createdAt: -1 })
+      .limit(6)
+      .lean();
 
     const availableCars = await Car.countDocuments();
 
