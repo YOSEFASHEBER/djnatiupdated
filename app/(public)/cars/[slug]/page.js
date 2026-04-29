@@ -231,9 +231,11 @@ export default async function CarDetailPage({ params }) {
     })
       .limit(3)
       .lean();
+const phoneNumbers = ["+251923708473", "+251931429999"];
 
-    const phoneNumber = "+251912345678";
-    const whatsappLink = `https://wa.me/${phoneNumber}?text=Hello, I'm interested in the ${car.brand} ${car.name}`;
+const phoneNumber =
+  phoneNumbers[Math.floor(Math.random() * phoneNumbers.length)];
+    const whatsappLink = `https://wa.me/${phoneNumbers[0]}?text=Hello, I'm interested in the ${car.brand} ${car.name}`;
 
     return (
       <main className="min-h-screen pt-24 pb-20 bg-slate-50 md:bg-gradient-to-br md:from-white md:via-red-50 md:to-white">
