@@ -192,7 +192,7 @@ export default function AboutPage() {
 
               <div className="relative rounded-3xl overflow-hidden border shadow-2xl">
                 <Image
-                  src="/images/dj-nati-owner.jpg"
+                  src="https://res.cloudinary.com/dznmeumqb/image/upload/IMG_20260502_131137_650_a9ixgc.jpg"
                   alt="DJ Nati founder of DJ Nati Cars dealership"
                   width={800}
                   height={900}
