@@ -210,7 +210,7 @@ export default function AboutPage() {
               </span>
 
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
-                DJ Nati
+                Natnael Getahun 
               </h2>
 
               <p className="text-slate-600 leading-relaxed">
