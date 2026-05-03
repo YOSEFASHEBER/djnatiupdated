@@ -3,6 +3,7 @@ import ConditionalNavbar from "@/components/ConditionalNavBar";
 import ConditionalFooter from "@/components/ConditionalFooter";
 import FloatingContact from "./(public)/contact/FloatingContact";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata = {
   title: {
@@ -26,6 +27,7 @@ export default function RootLayout({ children }) {
 
         <ConditionalFooter />
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
