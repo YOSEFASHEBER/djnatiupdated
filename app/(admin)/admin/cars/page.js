@@ -942,7 +942,7 @@ export default function AdminCarsPage() {
             >
               <div className="relative h-52 overflow-hidden">
                 <Image
-                  src={car?.images?.[0]?.url || "/placeholder.png"}
+                  src={car?.images?.[0] || "/placeholder.png"}
                   alt={car?.name}
                   fill
                   className="object-cover"

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,25 +25,22 @@ export default function Navbar() {
     <nav
       className={`fixed w-full z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-white/90 backdrop-blur-md shadow-md py-3"
-          : "bg-black/30 backdrop-blur-sm py-4"
+          ? "bg-white/10 backdrop-blur-md shadow-md"
+          : "bg-black/30 backdrop-blur-sm"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center h-14">
         {/* Logo */}
-        <div className="flex flex-col leading-tight border-l-4 border-red-500 pl-3">
-          <span
-            className={`text-xl font-extrabold ${
-              scrolled ? "text-gray-900" : "text-white"
-            }`}
-          >
-            DJ NATI
-          </span>
-
-          <span className="text-xs font-bold tracking-widest text-red-500 uppercase">
-            Cars
-          </span>
-        </div>
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/djnati.png"
+            alt="DJ Nati Cars"
+            width={100}
+            height={35}
+            className="object-contain"
+            priority
+          />
+        </Link>
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-8">
@@ -65,7 +63,7 @@ export default function Navbar() {
         <div className="hidden md:block">
           <Link
             href="/cars"
-            className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg font-semibold transition"
+            className="bg-red-500 hover:bg-red-600 text-white px-5 py-1.5 rounded-lg text-sm font-semibold transition"
           >
             Browse Cars
           </Link>
@@ -75,10 +73,10 @@ export default function Navbar() {
         <div className="md:hidden">
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className={`p-2 ${scrolled ? "text-gray-900" : "text-white"}`}
+            className={`p-1 ${scrolled ? "text-gray-900" : "text-white"}`}
           >
             <svg
-              className="w-7 h-7"
+              className="w-6 h-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -106,24 +104,23 @@ export default function Navbar() {
       {/* Mobile Menu */}
       <div
         className={`md:hidden transition-all duration-300 overflow-hidden ${
-          isOpen ? "max-h-screen opacity-100 mt-3" : "max-h-0 opacity-0"
+          isOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <div className="mx-4 p-5 rounded-xl bg-white shadow-lg flex flex-col gap-4">
+        <div className="mx-4 mb-2 p-4 rounded-xl bg-white shadow-lg flex flex-col gap-3">
           {menuItems.map((item) => (
             <Link
               key={item.name}
               href={item.href}
-              className="text-gray-800 font-semibold border-b pb-2"
+              className="text-gray-800 text-sm font-semibold border-b pb-2"
               onClick={() => setIsOpen(false)}
             >
               {item.name}
             </Link>
           ))}
-
           <Link
             href="/cars"
-            className="text-center bg-red-500 text-white py-3 rounded-lg font-bold"
+            className="text-center bg-red-500 text-white py-2 rounded-lg text-sm font-bold"
             onClick={() => setIsOpen(false)}
           >
             Browse Cars

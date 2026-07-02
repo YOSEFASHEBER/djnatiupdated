@@ -1,19 +1,5 @@
 import mongoose from "mongoose";
 
-const imageSchema = new mongoose.Schema(
-  {
-    url: {
-      type: String,
-      required: true,
-    },
-    public_id: {
-      type: String,
-      required: true,
-    },
-  },
-  { _id: false },
-);
-
 const CarSchema = new mongoose.Schema(
   {
     name: {
@@ -40,7 +26,16 @@ const CarSchema = new mongoose.Schema(
 
     category: {
       type: String,
-      enum: ["Sedan", "SUV", "Hatchback", "Truck", "Van"],
+      enum: [
+        "Sedan",
+        "SUV",
+        "Hatchback",
+        "Pick-up",
+        "Van",
+        "Crossover",
+        "Coupe",
+        "Off-roader",
+      ],
       required: true,
       index: true,
     },
@@ -72,8 +67,9 @@ const CarSchema = new mongoose.Schema(
       type: Number,
     },
 
+    // Array of local paths e.g. ["/assets/cars/toyota-camry-1.jpg"]
     images: {
-      type: [imageSchema],
+      type: [String],
       validate: {
         validator: (v) => v.length > 0,
         message: "At least one image is required",

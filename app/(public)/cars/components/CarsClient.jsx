@@ -188,11 +188,14 @@ export default function CarsClient({ initialData }) {
               className="w-full p-2 border rounded-xl focus:ring-2 focus:ring-red-500 outline-none text-slate-600"
             >
               <option value="">All Categories</option>
-              <option>SUV</option>
               <option>Sedan</option>
+              <option>SUV</option>
+              <option>Pick-up</option>
               <option>Hatchback</option>
-              <option>Truck</option>
               <option>Van</option>
+              <option>Crossover</option>
+              <option>Off-roader</option>
+              <option>Coupe</option>
             </select>
 
             <select

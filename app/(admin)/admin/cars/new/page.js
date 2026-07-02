@@ -1,1102 +1,3 @@
-// // // "use client";
-
-// // // import { useState } from "react";
-// // // import { useRouter } from "next/navigation";
-// // // import Image from "next/image";
-// // // import { UploadCloud, Loader2, X } from "lucide-react";
-
-// // // export default function CreateCarPage() {
-// // //   const router = useRouter();
-
-// // //   const [uploading, setUploading] = useState(false);
-// // //   const [saving, setSaving] = useState(false);
-
-// // //   const [toast, setToast] = useState({
-// // //     show: false,
-// // //     message: "",
-// // //     type: "success",
-// // //   });
-
-// // //   const showToast = (message, type = "success") => {
-// // //     setToast({ show: true, message, type });
-
-// // //     setTimeout(() => {
-// // //       setToast({ show: false, message: "", type: "success" });
-// // //     }, 3000);
-// // //   };
-
-// // //   const [form, setForm] = useState({
-// // //     name: "",
-// // //     brand: "",
-// // //     category: "Sedan",
-// // //     price: "",
-// // //     year: "",
-// // //     fuelType: "Petrol",
-// // //     transmission: "Automatic",
-// // //     mileage: "",
-// // //     status: "Available",
-// // //     description: "",
-// // //     images: [],
-// // //   });
-
-// // //   const handleChange = (e) => {
-// // //     const { name, value } = e.target;
-
-// // //     if (name === "price") {
-// // //       const raw = value.replace(/,/g, "");
-// // //       if (!raw) return setForm({ ...form, price: "" });
-
-// // //       setForm({
-// // //         ...form,
-// // //         price: Number(raw).toLocaleString(),
-// // //       });
-
-// // //       return;
-// // //     }
-
-// // //     setForm({
-// // //       ...form,
-// // //       [name]: value,
-// // //     });
-// // //   };
-
-// // //   const isFormValid =
-// // //     form.name &&
-// // //     form.brand &&
-// // //     form.price &&
-// // //     form.year &&
-// // //     form.images.length > 0;
-
-// // //   /* ================= IMAGE UPLOAD (ENHANCED ERROR HANDLING) ================= */
-
-// // //   const handleUpload = async (e) => {
-// // //     try {
-// // //       const files = Array.from(e.target.files || []);
-
-// // //       if (!files.length) {
-// // //         showToast("No files selected", "error");
-// // //         return;
-// // //       }
-
-// // //       setUploading(true);
-
-// // //       const formData = new FormData();
-// // //       files.forEach((file) => formData.append("files", file));
-
-// // //       const res = await fetch("/admin/upload", {
-// // //         method: "POST",
-// // //         body: formData,
-// // //       });
-
-// // //       if (!res.ok) {
-// // //         throw new Error(`Upload failed (${res.status})`);
-// // //       }
-
-// // //       let data;
-// // //       try {
-// // //         data = await res.json();
-// // //       } catch {
-// // //         throw new Error("Invalid server response");
-// // //       }
-
-// // //       if (!data?.urls || !Array.isArray(data.urls)) {
-// // //         throw new Error("No images returned from server");
-// // //       }
-
-// // //       setForm((prev) => ({
-// // //         ...prev,
-// // //         images: [...prev.images, ...data.urls],
-// // //       }));
-
-// // //       showToast("Images uploaded successfully");
-// // //     } catch (err) {
-// // //       console.error("Upload error:", err);
-// // //       showToast(err.message || "Image upload failed", "error");
-// // //     } finally {
-// // //       setUploading(false);
-// // //     }
-// // //   };
-
-// // //   const setThumbnail = (img) => {
-// // //     setForm((prev) => {
-// // //       const rest = prev.images.filter((i) => i.public_id !== img.public_id);
-// // //       return {
-// // //         ...prev,
-// // //         images: [img, ...rest],
-// // //       };
-// // //     });
-// // //   };
-
-// // //   const deleteImage = (img) => {
-// // //     setForm((prev) => ({
-// // //       ...prev,
-// // //       images: prev.images.filter((i) => i.public_id !== img.public_id),
-// // //     }));
-
-// // //     showToast("Image removed");
-// // //   };
-
-// // //   /* ================= SUBMIT (ENHANCED ERROR HANDLING) ================= */
-
-// // //   const handleSubmit = async (e) => {
-// // //     e.preventDefault();
-
-// // //     if (!isFormValid) {
-// // //       showToast("Please fill all required fields", "error");
-// // //       return;
-// // //     }
-
-// // //     setSaving(true);
-
-// // //     try {
-// // //       const res = await fetch("/api/admin/cars", {
-// // //         method: "POST",
-// // //         headers: {
-// // //           "Content-Type": "application/json",
-// // //         },
-// // //         body: JSON.stringify({
-// // //           ...form,
-// // //           price: Number(form.price.replace(/,/g, "")),
-// // //           year: Number(form.year),
-// // //           mileage: Number(form.mileage || 0),
-// // //         }),
-// // //       });
-
-// // //       if (!res.ok) {
-// // //         let msg = "Failed to create car";
-
-// // //         try {
-// // //           const errData = await res.json();
-// // //           msg = errData?.message || msg;
-// // //         } catch {}
-
-// // //         throw new Error(msg);
-// // //       }
-
-// // //       showToast("🚗 Car created successfully!");
-
-// // //       setTimeout(() => {
-// // //         router.push("/admin/cars");
-// // //       }, 1200);
-// // //     } catch (err) {
-// // //       console.error("Submit error:", err);
-// // //       showToast(err.message || "❌ Failed to create car", "error");
-// // //     } finally {
-// // //       setSaving(false);
-// // //     }
-// // //   };
-
-// // //   return (
-// // //     <main className="min-h-screen bg-gray-100 p-6 relative">
-// // //       {toast.show && (
-// // //         <div
-// // //           className={`fixed top-5 right-5 z-50 px-4 py-3 rounded-lg shadow-lg text-white transition-all duration-300 ${
-// // //             toast.type === "success" ? "bg-green-600" : "bg-red-600"
-// // //           }`}
-// // //         >
-// // //           {toast.message}
-// // //         </div>
-// // //       )}
-
-// // //       <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-md p-8 space-y-8">
-// // //         <h1 className="text-3xl font-bold text-gray-800">Add New Car</h1>
-
-// // //         <form onSubmit={handleSubmit} className="space-y-8 text-slate-600">
-// // //           <div className="grid md:grid-cols-2 gap-6">
-// // //             <input
-// // //               name="name"
-// // //               placeholder="Car Name *"
-// // //               value={form.name}
-// // //               onChange={handleChange}
-// // //               className="input"
-// // //             />
-
-// // //             <input
-// // //               name="brand"
-// // //               placeholder="Brand *"
-// // //               value={form.brand}
-// // //               onChange={handleChange}
-// // //               className="input"
-// // //             />
-// // //           </div>
-
-// // //           <div className="grid md:grid-cols-3 gap-6">
-// // //             <input
-// // //               name="price"
-// // //               placeholder="Price *"
-// // //               value={form.price}
-// // //               onChange={handleChange}
-// // //               className="input"
-// // //             />
-
-// // //             <input
-// // //               name="year"
-// // //               placeholder="Year *"
-// // //               value={form.year}
-// // //               onChange={handleChange}
-// // //               className="input"
-// // //             />
-
-// // //             <input
-// // //               name="mileage"
-// // //               placeholder="Mileage"
-// // //               value={form.mileage}
-// // //               onChange={handleChange}
-// // //               className="input"
-// // //             />
-// // //           </div>
-
-// // //           <div className="grid md:grid-cols-3 gap-6">
-// // //             <select
-// // //               name="category"
-// // //               value={form.category}
-// // //               onChange={handleChange}
-// // //               className="input"
-// // //             >
-// // //               <option>Sedan</option>
-// // //               <option>SUV</option>
-// // //               <option>Pickup</option>
-// // //               <option>Hatchback</option>
-// // //               <option>Van</option>
-// // //             </select>
-
-// // //             <select
-// // //               name="fuelType"
-// // //               value={form.fuelType}
-// // //               onChange={handleChange}
-// // //               className="input"
-// // //             >
-// // //               <option>Petrol</option>
-// // //               <option>Diesel</option>
-// // //               <option>Hybrid</option>
-// // //               <option>Electric</option>
-// // //             </select>
-
-// // //             <select
-// // //               name="transmission"
-// // //               value={form.transmission}
-// // //               onChange={handleChange}
-// // //               className="input"
-// // //             >
-// // //               <option>Automatic</option>
-// // //               <option>Manual</option>
-// // //             </select>
-// // //           </div>
-
-// // //           <select
-// // //             name="status"
-// // //             value={form.status}
-// // //             onChange={handleChange}
-// // //             className="input"
-// // //           >
-// // //             <option>Available</option>
-// // //             <option>Sold</option>
-// // //           </select>
-
-// // //           <textarea
-// // //             name="description"
-// // //             placeholder="Car description..."
-// // //             value={form.description}
-// // //             onChange={handleChange}
-// // //             rows={4}
-// // //             className="input"
-// // //           />
-
-// // //           <div className="border-2 border-dashed rounded-xl p-8 text-center">
-// // //             <label className="cursor-pointer flex flex-col items-center gap-2">
-// // //               {uploading ? (
-// // //                 <>
-// // //                   <Loader2 className="animate-spin" />
-// // //                   Uploading...
-// // //                 </>
-// // //               ) : (
-// // //                 <>
-// // //                   <UploadCloud size={40} />
-// // //                   Upload Images
-// // //                 </>
-// // //               )}
-
-// // //               <input
-// // //                 type="file"
-// // //                 multiple
-// // //                 onChange={handleUpload}
-// // //                 className="hidden"
-// // //               />
-// // //             </label>
-// // //           </div>
-
-// // //           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-// // //             {form.images.map((img, index) => {
-// // //               const isThumbnail = index === 0;
-
-// // //               return (
-// // //                 <div
-// // //                   key={img.public_id}
-// // //                   onClick={() => setThumbnail(img)}
-// // //                   className={`relative cursor-pointer rounded-xl overflow-hidden ${
-// // //                     isThumbnail ? "ring-4 ring-blue-500" : "hover:ring-2"
-// // //                   }`}
-// // //                 >
-// // //                   <Image
-// // //                     src={img.url}
-// // //                     alt="car"
-// // //                     width={300}
-// // //                     height={200}
-// // //                     className="object-cover w-full h-32"
-// // //                   />
-
-// // //                   {isThumbnail && (
-// // //                     <span className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
-// // //                       Thumbnail
-// // //                     </span>
-// // //                   )}
-
-// // //                   <button
-// // //                     type="button"
-// // //                     onClick={(e) => {
-// // //                       e.stopPropagation();
-// // //                       deleteImage(img);
-// // //                     }}
-// // //                     className="absolute top-2 right-2 bg-white p-1 rounded-full"
-// // //                   >
-// // //                     <X size={16} />
-// // //                   </button>
-// // //                 </div>
-// // //               );
-// // //             })}
-// // //           </div>
-
-// // //           <button
-// // //             type="submit"
-// // //             disabled={!isFormValid || saving}
-// // //             className={`w-full py-3 rounded-xl font-semibold ${
-// // //               !isFormValid
-// // //                 ? "bg-gray-300"
-// // //                 : "bg-red-500 text-white hover:bg-red-600"
-// // //             }`}
-// // //           >
-// // //             {saving ? "Creating..." : "Create Car"}
-// // //           </button>
-// // //         </form>
-// // //       </div>
-
-// // //       <style jsx>{`
-// // //         .input {
-// // //           width: 100%;
-// // //           padding: 12px;
-// // //           border-radius: 10px;
-// // //           border: 1px solid #e5e7eb;
-// // //         }
-
-// // //         .input:focus {
-// // //           outline: none;
-// // //           border-color: #ef4444;
-// // //         }
-// // //       `}</style>
-// // //     </main>
-// // //   );
-// // // }
-
-// // // "use client";
-
-// // // import { useState } from "react";
-// // // import { useRouter } from "next/navigation";
-// // // import Image from "next/image";
-// // // import { UploadCloud, Loader2, X } from "lucide-react";
-
-// // // export default function CreateCarPage() {
-// // //   const router = useRouter();
-
-// // //   const [uploading, setUploading] = useState(false);
-// // //   const [saving, setSaving] = useState(false);
-
-// // //   const [toast, setToast] = useState({
-// // //     show: false,
-// // //     message: "",
-// // //     type: "success",
-// // //   });
-
-// // //   const showToast = (message, type = "success") => {
-// // //     setToast({ show: true, message, type });
-
-// // //     setTimeout(() => {
-// // //       setToast({ show: false, message: "", type: "success" });
-// // //     }, 4000);
-// // //   };
-
-// // //   const [form, setForm] = useState({
-// // //     name: "",
-// // //     brand: "",
-// // //     category: "Sedan",
-// // //     price: "",
-// // //     year: "",
-// // //     fuelType: "Petrol",
-// // //     transmission: "Automatic",
-// // //     mileage: "",
-// // //     status: "Available",
-// // //     description: "",
-// // //     images: [],
-// // //   });
-
-// // //   const handleChange = (e) => {
-// // //     const { name, value } = e.target;
-
-// // //     if (name === "price") {
-// // //       const raw = value.replace(/,/g, "");
-// // //       if (!raw) return setForm({ ...form, price: "" });
-
-// // //       setForm({
-// // //         ...form,
-// // //         price: Number(raw).toLocaleString(),
-// // //       });
-
-// // //       return;
-// // //     }
-
-// // //     setForm({
-// // //       ...form,
-// // //       [name]: value,
-// // //     });
-// // //   };
-
-// // //   const isFormValid =
-// // //     form.name &&
-// // //     form.brand &&
-// // //     form.price &&
-// // //     form.year &&
-// // //     form.images.length > 0;
-
-// // //   /* ================= IMAGE UPLOAD ================= */
-
-// // //   const handleUpload = async (e) => {
-// // //     try {
-// // //       const files = Array.from(e.target.files || []);
-
-// // //       if (!files.length) {
-// // //         showToast("No files selected", "error");
-// // //         return;
-// // //       }
-
-// // //       setUploading(true);
-
-// // //       const formData = new FormData();
-// // //       files.forEach((file) => formData.append("files", file));
-
-// // //       const res = await fetch("/admin/upload", {
-// // //         method: "POST",
-// // //         body: formData,
-// // //       });
-
-// // //       if (!res.ok) {
-// // //         throw new Error(`Upload failed (${res.status})`);
-// // //       }
-
-// // //       const data = await res.json();
-
-// // //       if (!data?.urls) {
-// // //         throw new Error("No images returned from server");
-// // //       }
-
-// // //       setForm((prev) => ({
-// // //         ...prev,
-// // //         images: [...prev.images, ...data.urls],
-// // //       }));
-
-// // //       showToast("Images uploaded successfully");
-// // //     } catch (err) {
-// // //       showToast(err.message || "Image upload failed", "error");
-// // //     } finally {
-// // //       setUploading(false);
-// // //     }
-// // //   };
-
-// // //   const setThumbnail = (img) => {
-// // //     setForm((prev) => {
-// // //       const rest = prev.images.filter((i) => i.public_id !== img.public_id);
-// // //       return {
-// // //         ...prev,
-// // //         images: [img, ...rest],
-// // //       };
-// // //     });
-// // //   };
-
-// // //   const deleteImage = (img) => {
-// // //     setForm((prev) => ({
-// // //       ...prev,
-// // //       images: prev.images.filter((i) => i.public_id !== img.public_id),
-// // //     }));
-
-// // //     showToast("Image removed");
-// // //   };
-
-// // //   /* ================= SUBMIT (FIXED ERROR HANDLING) ================= */
-
-// // //   const handleSubmit = async (e) => {
-// // //     e.preventDefault();
-
-// // //     if (!isFormValid) {
-// // //       showToast("Please fill all required fields", "error");
-// // //       return;
-// // //     }
-
-// // //     setSaving(true);
-
-// // //     try {
-// // //       const res = await fetch("/api/admin/cars", {
-// // //         method: "POST",
-// // //         headers: {
-// // //           "Content-Type": "application/json",
-// // //         },
-// // //         body: JSON.stringify({
-// // //           ...form,
-// // //           price: Number(form.price.replace(/,/g, "")),
-// // //           year: Number(form.year),
-// // //           mileage: Number(form.mileage || 0),
-// // //         }),
-// // //       });
-
-// // //       const data = await res.json();
-
-// // //       if (!res.ok || !data?.success) {
-// // //         // ================= HANDLE BACKEND ERRORS =================
-
-// // //         if (data?.errors && typeof data.errors === "object") {
-// // //           const errorMessage = Object.values(data.errors).join("\n");
-// // //           throw new Error(errorMessage);
-// // //         }
-
-// // //         throw new Error(data?.error || "Failed to create car");
-// // //       }
-
-// // //       showToast("🚗 Car created successfully!");
-
-// // //       setTimeout(() => {
-// // //         router.push("/admin/cars");
-// // //       }, 1200);
-// // //     } catch (err) {
-// // //       showToast(err.message || "Something went wrong", "error");
-// // //     } finally {
-// // //       setSaving(false);
-// // //     }
-// // //   };
-
-// // //   return (
-// // //     <main className="min-h-screen bg-gray-100 p-6 relative">
-// // //       {/* TOAST */}
-// // //       {toast.show && (
-// // //         <div
-// // //           className={`fixed top-5 right-5 z-50 px-4 py-3 rounded-lg shadow-lg text-white whitespace-pre-line ${
-// // //             toast.type === "success" ? "bg-green-600" : "bg-red-600"
-// // //           }`}
-// // //         >
-// // //           {toast.message}
-// // //         </div>
-// // //       )}
-
-// // //       <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-md p-8 space-y-8">
-// // //         <h1 className="text-3xl font-bold text-gray-800">Add New Car</h1>
-
-// // //         <form onSubmit={handleSubmit} className="space-y-8 text-slate-600">
-// // //           <div className="grid md:grid-cols-2 gap-6">
-// // //             <input
-// // //               name="name"
-// // //               placeholder="Car Name *"
-// // //               value={form.name}
-// // //               onChange={handleChange}
-// // //               className="input"
-// // //             />
-
-// // //             <input
-// // //               name="brand"
-// // //               placeholder="Brand *"
-// // //               value={form.brand}
-// // //               onChange={handleChange}
-// // //               className="input"
-// // //             />
-// // //           </div>
-
-// // //           <div className="grid md:grid-cols-3 gap-6">
-// // //             <input
-// // //               name="price"
-// // //               placeholder="Price *"
-// // //               value={form.price}
-// // //               onChange={handleChange}
-// // //               className="input"
-// // //             />
-
-// // //             <input
-// // //               name="year"
-// // //               placeholder="Year *"
-// // //               value={form.year}
-// // //               onChange={handleChange}
-// // //               className="input"
-// // //             />
-
-// // //             <input
-// // //               name="mileage"
-// // //               placeholder="Mileage"
-// // //               value={form.mileage}
-// // //               onChange={handleChange}
-// // //               className="input"
-// // //             />
-// // //           </div>
-
-// // //           <select
-// // //             name="category"
-// // //             value={form.category}
-// // //             onChange={handleChange}
-// // //             className="input"
-// // //           >
-// // //             <option>Sedan</option>
-// // //             <option>SUV</option>
-// // //             <option>Pickup</option>
-// // //             <option>Hatchback</option>
-// // //             <option>Van</option>
-// // //           </select>
-
-// // //           <select
-// // //             name="fuelType"
-// // //             value={form.fuelType}
-// // //             onChange={handleChange}
-// // //             className="input"
-// // //           >
-// // //             <option>Petrol</option>
-// // //             <option>Diesel</option>
-// // //             <option>Hybrid</option>
-// // //             <option>Electric</option>
-// // //           </select>
-
-// // //           <select
-// // //             name="transmission"
-// // //             value={form.transmission}
-// // //             onChange={handleChange}
-// // //             className="input"
-// // //           >
-// // //             <option>Automatic</option>
-// // //             <option>Manual</option>
-// // //           </select>
-
-// // //           <select
-// // //             name="status"
-// // //             value={form.status}
-// // //             onChange={handleChange}
-// // //             className="input"
-// // //           >
-// // //             <option>Available</option>
-// // //             <option>Sold</option>
-// // //           </select>
-
-// // //           <textarea
-// // //             name="description"
-// // //             placeholder="Car description..."
-// // //             value={form.description}
-// // //             onChange={handleChange}
-// // //             rows={4}
-// // //             className="input"
-// // //           />
-
-// // //           {/* UPLOAD */}
-// // //           <div className="border-2 border-dashed rounded-xl p-8 text-center">
-// // //             <label className="cursor-pointer flex flex-col items-center gap-2">
-// // //               {uploading ? (
-// // //                 <>
-// // //                   <Loader2 className="animate-spin" />
-// // //                   Uploading...
-// // //                 </>
-// // //               ) : (
-// // //                 <>
-// // //                   <UploadCloud size={40} />
-// // //                   Upload Images
-// // //                 </>
-// // //               )}
-
-// // //               <input
-// // //                 type="file"
-// // //                 multiple
-// // //                 onChange={handleUpload}
-// // //                 className="hidden"
-// // //               />
-// // //             </label>
-// // //           </div>
-
-// // //           {/* IMAGES */}
-// // //           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-// // //             {form.images.map((img, index) => {
-// // //               const isThumbnail = index === 0;
-
-// // //               return (
-// // //                 <div
-// // //                   key={img.public_id}
-// // //                   onClick={() => setThumbnail(img)}
-// // //                   className={`relative cursor-pointer rounded-xl overflow-hidden ${
-// // //                     isThumbnail ? "ring-4 ring-blue-500" : "hover:ring-2"
-// // //                   }`}
-// // //                 >
-// // //                   <Image
-// // //                     src={img.url}
-// // //                     alt="car"
-// // //                     width={300}
-// // //                     height={200}
-// // //                     className="object-cover w-full h-32"
-// // //                   />
-
-// // //                   <button
-// // //                     type="button"
-// // //                     onClick={(e) => {
-// // //                       e.stopPropagation();
-// // //                       deleteImage(img);
-// // //                     }}
-// // //                     className="absolute top-2 right-2 bg-white p-1 rounded-full"
-// // //                   >
-// // //                     <X size={16} />
-// // //                   </button>
-// // //                 </div>
-// // //               );
-// // //             })}
-// // //           </div>
-
-// // //           <button
-// // //             type="submit"
-// // //             disabled={!isFormValid || saving}
-// // //             className={`w-full py-3 rounded-xl font-semibold ${
-// // //               !isFormValid
-// // //                 ? "bg-gray-300"
-// // //                 : "bg-red-500 text-white hover:bg-red-600"
-// // //             }`}
-// // //           >
-// // //             {saving ? "Creating..." : "Create Car"}
-// // //           </button>
-// // //         </form>
-// // //       </div>
-
-// // //       <style jsx>{`
-// // //         .input {
-// // //           width: 100%;
-// // //           padding: 12px;
-// // //           border-radius: 10px;
-// // //           border: 1px solid #e5e7eb;
-// // //         }
-
-// // //         .input:focus {
-// // //           outline: none;
-// // //           border-color: #ef4444;
-// // //         }
-// // //       `}</style>
-// // //     </main>
-// // //   );
-// // // }
-
-// // "use client";
-
-// // import { useState } from "react";
-// // import { useRouter } from "next/navigation";
-// // import Image from "next/image";
-// // import { UploadCloud, Loader2, X } from "lucide-react";
-
-// // export default function CreateCarPage() {
-// //   const router = useRouter();
-
-// //   const [uploading, setUploading] = useState(false);
-// //   const [saving, setSaving] = useState(false);
-
-// //   const [toast, setToast] = useState({
-// //     show: false,
-// //     message: "",
-// //     type: "success",
-// //   });
-
-// //   const [errors, setErrors] = useState({});
-
-// //   const showToast = (message, type = "success") => {
-// //     setToast({ show: true, message, type });
-
-// //     setTimeout(() => {
-// //       setToast({ show: false, message: "", type: "success" });
-// //     }, 3000);
-// //   };
-
-// //   const [form, setForm] = useState({
-// //     name: "",
-// //     brand: "",
-// //     category: "Sedan",
-// //     price: "",
-// //     year: "",
-// //     fuelType: "Petrol",
-// //     transmission: "Automatic",
-// //     mileage: "",
-// //     status: "Available",
-// //     description: "",
-// //     images: [],
-// //   });
-
-// //   // ================= INLINE ERROR HELPERS =================
-// //   const setFieldError = (field, message) => {
-// //     setErrors((prev) => ({ ...prev, [field]: message }));
-// //   };
-
-// //   const clearFieldError = (field) => {
-// //     setErrors((prev) => {
-// //       const copy = { ...prev };
-// //       delete copy[field];
-// //       return copy;
-// //     });
-// //   };
-
-// //   // ================= SMART INPUT HANDLER =================
-// //   const handleChange = (e) => {
-// //     const { name, value } = e.target;
-
-// //     let newValue = value;
-
-// //     // ===== PRICE FORMAT =====
-// //     if (name === "price") {
-// //       const raw = value.replace(/,/g, "");
-
-// //       if (raw && isNaN(raw)) return;
-
-// //       newValue = raw ? Number(raw).toLocaleString() : "";
-// //     }
-
-// //     // ===== MILEAGE FORMAT =====
-// //     if (name === "mileage") {
-// //       const raw = value.replace(/,/g, "");
-
-// //       if (raw && isNaN(raw)) return;
-
-// //       newValue = raw ? Number(raw).toLocaleString() : "";
-// //     }
-
-// //     setForm((prev) => ({
-// //       ...prev,
-// //       [name]: newValue,
-// //     }));
-
-// //     clearFieldError(name);
-// //   };
-
-// //   const isFormValid =
-// //     form.name &&
-// //     form.brand &&
-// //     form.price &&
-// //     form.year &&
-// //     form.images.length > 0;
-
-// //   // ================= VALIDATION =================
-// //   const validateForm = () => {
-// //     const newErrors = {};
-
-// //     if (!form.name.trim()) newErrors.name = "Car name is required";
-// //     if (!form.brand.trim()) newErrors.brand = "Brand is required";
-// //     if (!form.price) newErrors.price = "Price is required";
-// //     if (!form.year) newErrors.year = "Year is required";
-// //     if (form.images.length === 0)
-// //       newErrors.images = "At least one image required";
-
-// //     setErrors(newErrors);
-
-// //     return Object.keys(newErrors).length === 0;
-// //   };
-
-// //   // ================= IMAGE UPLOAD =================
-// //   const handleUpload = async (e) => {
-// //     try {
-// //       const files = Array.from(e.target.files || []);
-
-// //       if (!files.length) {
-// //         showToast("No files selected", "error");
-// //         return;
-// //       }
-
-// //       setUploading(true);
-
-// //       const formData = new FormData();
-// //       files.forEach((file) => formData.append("files", file));
-
-// //       const res = await fetch("/admin/upload", {
-// //         method: "POST",
-// //         body: formData,
-// //       });
-
-// //       if (!res.ok) throw new Error("Upload failed");
-
-// //       const data = await res.json();
-
-// //       setForm((prev) => ({
-// //         ...prev,
-// //         images: [...prev.images, ...data.urls],
-// //       }));
-
-// //       showToast("Images uploaded");
-// //     } catch (err) {
-// //       showToast(err.message, "error");
-// //     } finally {
-// //       setUploading(false);
-// //     }
-// //   };
-
-// //   const deleteImage = (img) => {
-// //     setForm((prev) => ({
-// //       ...prev,
-// //       images: prev.images.filter((i) => i.public_id !== img.public_id),
-// //     }));
-// //   };
-
-// //   // ================= SUBMIT =================
-// //   const handleSubmit = async (e) => {
-// //     e.preventDefault();
-
-// //     if (!validateForm()) {
-// //       showToast("Please fix form errors", "error");
-// //       return;
-// //     }
-
-// //     setSaving(true);
-
-// //     try {
-// //       const res = await fetch("/api/admin/cars", {
-// //         method: "POST",
-// //         headers: { "Content-Type": "application/json" },
-// //         body: JSON.stringify({
-// //           ...form,
-// //           price: Number(form.price.replace(/,/g, "")),
-// //           year: Number(form.year),
-// //           mileage: Number(form.mileage?.replace(/,/g, "") || 0),
-// //         }),
-// //       });
-
-// //       const data = await res.json();
-
-// //       if (!res.ok) throw new Error(data?.error || "Failed");
-
-// //       showToast("Car created successfully");
-
-// //       setTimeout(() => router.push("/admin/cars"), 1200);
-// //     } catch (err) {
-// //       showToast(err.message, "error");
-// //     } finally {
-// //       setSaving(false);
-// //     }
-// //   };
-
-// //   // ================= INPUT CLASS =================
-// //   const inputClass = (field) =>
-// //     `input ${errors[field] ? "border-red-500" : "border-gray-300"}`;
-
-// //   return (
-// //     <main className="min-h-screen bg-gray-100 p-6 relative">
-// //       {/* TOAST */}
-// //       {toast.show && (
-// //         <div
-// //           className={`fixed top-5 right-5 z-50 px-4 py-3 rounded-lg text-white ${
-// //             toast.type === "success" ? "bg-green-600" : "bg-red-600"
-// //           }`}
-// //         >
-// //           {toast.message}
-// //         </div>
-// //       )}
-
-// //       <div className="max-w-6xl mx-auto bg-white p-8 rounded-xl space-y-6">
-// //         <h1 className="text-3xl font-bold">Add New Car</h1>
-
-// //         <form onSubmit={handleSubmit} className="space-y-6">
-// //           {/* NAME + BRAND */}
-// //           <div className="grid md:grid-cols-2 gap-4">
-// //             <div>
-// //               <input
-// //                 name="name"
-// //                 value={form.name}
-// //                 onChange={handleChange}
-// //                 placeholder="Car Name"
-// //                 className={inputClass("name")}
-// //               />
-// //               {errors.name && (
-// //                 <p className="text-red-500 text-sm">{errors.name}</p>
-// //               )}
-// //             </div>
-
-// //             <div>
-// //               <input
-// //                 name="brand"
-// //                 value={form.brand}
-// //                 onChange={handleChange}
-// //                 placeholder="Brand"
-// //                 className={inputClass("brand")}
-// //               />
-// //               {errors.brand && (
-// //                 <p className="text-red-500 text-sm">{errors.brand}</p>
-// //               )}
-// //             </div>
-// //           </div>
-
-// //           {/* PRICE + YEAR + MILEAGE */}
-// //           <div className="grid md:grid-cols-3 gap-4">
-// //             <div>
-// //               <input
-// //                 name="price"
-// //                 value={form.price}
-// //                 onChange={handleChange}
-// //                 placeholder="Price"
-// //                 className={inputClass("price")}
-// //               />
-// //               {errors.price && (
-// //                 <p className="text-red-500 text-sm">{errors.price}</p>
-// //               )}
-// //             </div>
-
-// //             <div>
-// //               <input
-// //                 name="year"
-// //                 value={form.year}
-// //                 onChange={handleChange}
-// //                 placeholder="Year"
-// //                 className={inputClass("year")}
-// //               />
-// //               {errors.year && (
-// //                 <p className="text-red-500 text-sm">{errors.year}</p>
-// //               )}
-// //             </div>
-
-// //             <input
-// //               name="mileage"
-// //               value={form.mileage}
-// //               onChange={handleChange}
-// //               placeholder="Mileage"
-// //               className="input"
-// //             />
-// //           </div>
-
-// //           {/* IMAGE ERROR */}
-// //           {errors.images && (
-// //             <p className="text-red-500 text-sm">{errors.images}</p>
-// //           )}
-
-// //           {/* SUBMIT */}
-// //           <button
-// //             type="submit"
-// //             disabled={saving}
-// //             className="w-full bg-red-500 text-white py-3 rounded-xl"
-// //           >
-// //             {saving ? "Creating..." : "Create Car"}
-// //           </button>
-// //         </form>
-// //       </div>
-
-// //       <style jsx>{`
-// //         .input {
-// //           width: 100%;
-// //           padding: 12px;
-// //           border-radius: 10px;
-// //           border: 1px solid #ddd;
-// //         }
-
-// //         .input:focus {
-// //           outline: none;
-// //           border-color: #ef4444;
-// //         }
-// //       `}</style>
-// //     </main>
-// //   );
-// // }
 // "use client";
 
 // import { useState } from "react";
@@ -1107,7 +8,6 @@
 // export default function CreateCarPage() {
 //   const router = useRouter();
 
-//   const [uploading, setUploading] = useState(false);
 //   const [saving, setSaving] = useState(false);
 
 //   const [toast, setToast] = useState({
@@ -1122,7 +22,7 @@
 //     setToast({ show: true, message, type });
 //     setTimeout(() => {
 //       setToast({ show: false, message: "", type: "success" });
-//     }, 3000);
+//     }, 3500);
 //   };
 
 //   const [form, setForm] = useState({
@@ -1136,106 +36,132 @@
 //     mileage: "",
 //     status: "Available",
 //     description: "",
-//     images: [],
+//     images: [], // plain strings: ["/assets/cars/toyota-camry.jpg"]
 //   });
 
-//   // ================= FORMAT HELPERS =================
-//   const formatNumber = (value) => {
-//     const raw = value.replace(/,/g, "");
-//     if (!raw || isNaN(raw)) return "";
-//     return Number(raw).toLocaleString();
+//   // ================= IMAGE PICKER =================
+//   const [availableImages, setAvailableImages] = useState([]);
+//   const [showPicker, setShowPicker] = useState(false);
+//   const [loadingImages, setLoadingImages] = useState(false);
+
+//   const openPicker = async () => {
+//     setLoadingImages(true);
+//     setShowPicker(true);
+//     try {
+//       const res = await fetch("/api/upload"); // GET — reads public/assets/cars/
+//       const data = await res.json();
+//       setAvailableImages(data.images || []);
+//     } catch (err) {
+//       showToast("Failed to load images", "error");
+//       setShowPicker(false);
+//     } finally {
+//       setLoadingImages(false);
+//     }
 //   };
 
-//   const handleChange = (e) => {
-//     const { name, value } = e.target;
+//   const toggleImageSelection = (imgPath) => {
+//     setForm((prev) => {
+//       const already = prev.images.includes(imgPath);
+//       const updated = already
+//         ? prev.images.filter((i) => i !== imgPath)
+//         : [...prev.images, imgPath];
+//       setErrors((e) => ({ ...e, images: updated.length ? "" : e.images }));
+//       return { ...prev, images: updated };
+//     });
+//   };
 
-//     let newValue = value;
-
-//     if (name === "price" || name === "mileage" || name === "year") {
-//       const raw = value.replace(/,/g, "");
-//       if (raw && isNaN(raw)) return;
-//       newValue = raw ? Number(raw).toLocaleString() : "";
-//     }
-
+//   const setThumbnail = (img) => {
 //     setForm((prev) => ({
 //       ...prev,
-//       [name]: newValue,
+//       images: [img, ...prev.images.filter((i) => i !== img)],
 //     }));
-
-//     setErrors((prev) => ({ ...prev, [name]: "" }));
-//   };
-
-//   const validateForm = () => {
-//     const err = {};
-
-//     if (!form.name) err.name = "Car name required";
-//     if (!form.brand) err.brand = "Brand required";
-//     if (!form.price) err.price = "Price required";
-//     if (!form.year) err.year = "Year required";
-//     if (!form.images.length) err.images = "Add at least one image";
-
-//     setErrors(err);
-//     return Object.keys(err).length === 0;
-//   };
-
-//   const inputClass = (field) =>
-//     `input ${
-//       errors[field]
-//         ? "border-red-500 focus:border-red-500"
-//         : "border-gray-200 focus:border-red-400"
-//     }`;
-
-//   // ================= IMAGE UPLOAD =================
-//   const handleUpload = async (e) => {
-//     const files = Array.from(e.target.files || []);
-//     if (!files.length) return;
-
-//     setUploading(true);
-
-//     try {
-//       const formData = new FormData();
-//       files.forEach((f) => formData.append("files", f));
-
-//       const res = await fetch("/admin/upload", {
-//         method: "POST",
-//         body: formData,
-//       });
-
-//       const data = await res.json();
-
-//       if (!res.ok) throw new Error(data?.error || "Upload failed");
-
-//       setForm((prev) => ({
-//         ...prev,
-//         images: [...prev.images, ...data.urls],
-//       }));
-//     } catch (err) {
-//       showToast(err.message, "error");
-//     } finally {
-//       setUploading(false);
-//     }
 //   };
 
 //   const deleteImage = (img) => {
 //     setForm((prev) => ({
 //       ...prev,
-//       images: prev.images.filter((i) => i.public_id !== img.public_id),
+//       images: prev.images.filter((i) => i !== img),
 //     }));
 //   };
 
-//   const setThumbnail = (img) => {
-//     setForm((prev) => {
-//       const rest = prev.images.filter((i) => i.public_id !== img.public_id);
-//       return { ...prev, images: [img, ...rest] };
-//     });
+//   // ================= VALIDATION =================
+//   const validate = () => {
+//     const newErrors = {};
+
+//     if (!form.name.trim()) newErrors.name = "Car name is required";
+//     if (!form.brand.trim()) newErrors.brand = "Brand is required";
+//     if (!form.category) newErrors.category = "Category is required";
+
+//     if (!form.price || isNaN(Number(form.price.replace(/,/g, "")))) {
+//       newErrors.price = "Valid price is required";
+//     }
+
+//     if (!form.year || isNaN(Number(form.year))) {
+//       newErrors.year = "Valid year is required";
+//     }
+
+//     if (!form.fuelType) newErrors.fuelType = "Fuel type is required";
+//     if (!form.transmission) newErrors.transmission = "Transmission required";
+
+//     if (form.images.length === 0) {
+//       newErrors.images = "At least one image is required";
+//     }
+
+//     setErrors(newErrors);
+//     return Object.keys(newErrors).length === 0;
 //   };
+
+//   // ================= HANDLE CHANGE =================
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+
+//     setErrors((prev) => ({ ...prev, [name]: "" }));
+
+//     if (name === "price") {
+//       const raw = value.replace(/,/g, "");
+//       if (!raw) {
+//         setForm({ ...form, price: "" });
+//         return;
+//       }
+//       if (!isNaN(raw)) {
+//         setForm({ ...form, price: Number(raw).toLocaleString() });
+//       }
+//       return;
+//     }
+
+//     if (name === "mileage") {
+//       const raw = value.replace(/,/g, "");
+//       if (!raw) {
+//         setForm({ ...form, mileage: "" });
+//         return;
+//       }
+//       if (!isNaN(raw)) {
+//         setForm({ ...form, mileage: Number(raw).toLocaleString() });
+//       }
+//       return;
+//     }
+
+//     setForm({ ...form, [name]: value });
+//   };
+
+//   const isFormValid =
+//     form.name.trim() &&
+//     form.brand.trim() &&
+//     form.category &&
+//     form.price &&
+//     !isNaN(Number(form.price.replace(/,/g, ""))) &&
+//     form.year &&
+//     !isNaN(Number(form.year)) &&
+//     form.fuelType &&
+//     form.transmission &&
+//     form.images.length > 0;
 
 //   // ================= SUBMIT =================
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
 
-//     if (!validateForm()) {
-//       showToast("Fix form errors", "error");
+//     if (!validate()) {
+//       showToast("Please fix form errors", "error");
 //       return;
 //     }
 
@@ -1248,18 +174,19 @@
 //         body: JSON.stringify({
 //           ...form,
 //           price: Number(form.price.replace(/,/g, "")),
-//           year: Number(form.year.replace(/,/g, "")),
-//           mileage: Number(form.mileage.replace(/,/g, "") || 0),
+//           year: Number(form.year),
+//           mileage: Number(form.mileage?.replace(/,/g, "") || 0),
 //         }),
 //       });
 
 //       const data = await res.json();
 
-//       if (!res.ok) throw new Error(data?.error || "Failed");
+//       if (!res.ok || !data?.success) {
+//         throw new Error(data?.error || "Failed to create car");
+//       }
 
-//       showToast("Car created successfully 🚗");
-
-//       setTimeout(() => router.push("/admin/cars"), 1200);
+//       showToast("🚗 Car created successfully!");
+//       router.push("/admin/cars");
 //     } catch (err) {
 //       showToast(err.message, "error");
 //     } finally {
@@ -1267,28 +194,18 @@
 //     }
 //   };
 
-//   // ================= INPUT =================
-//   const Input = ({ name, placeholder }) => (
-//     <div>
-//       <input
-//         name={name}
-//         value={form[name]}
-//         onChange={handleChange}
-//         placeholder={placeholder}
-//         className={inputClass(name)}
-//       />
-//       {errors[name] && (
-//         <p className="text-red-500 text-sm mt-1">{errors[name]}</p>
-//       )}
-//     </div>
-//   );
+//   // ================= INPUT CLASS =================
+//   const inputClass = (field) =>
+//     `w-full p-3 rounded-lg border text-slate-600 ${
+//       errors[field] ? "border-red-500" : "border-gray-200"
+//     } focus:outline-none focus:border-red-500`;
 
 //   return (
-//     <main className="min-h-screen bg-gray-100 p-6">
+//     <main className="min-h-screen bg-gray-100 p-6 relative text-slate-600">
 //       {/* TOAST */}
 //       {toast.show && (
 //         <div
-//           className={`fixed top-5 right-5 z-50 px-4 py-3 text-white rounded-lg ${
+//           className={`fixed top-5 right-5 z-50 px-4 py-3 rounded-lg shadow-lg text-white ${
 //             toast.type === "success" ? "bg-green-600" : "bg-red-600"
 //           }`}
 //         >
@@ -1296,173 +213,327 @@
 //         </div>
 //       )}
 
-//       <div className="max-w-5xl mx-auto bg-white p-8 rounded-xl space-y-6">
+//       {/* IMAGE PICKER MODAL */}
+//       {showPicker && (
+//         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+//           <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+//             <div className="flex items-center justify-between p-4 border-b">
+//               <h2 className="text-lg font-semibold text-gray-800">
+//                 Pick Images from Assets
+//               </h2>
+//               <button
+//                 type="button"
+//                 onClick={() => setShowPicker(false)}
+//                 className="text-gray-500 hover:text-gray-800 text-xl font-bold"
+//               >
+//                 ✕
+//               </button>
+//             </div>
+
+//             <div className="overflow-y-auto p-4 grid grid-cols-3 gap-3">
+//               {loadingImages ? (
+//                 <div className="col-span-3 flex justify-center py-10">
+//                   <Loader2 className="animate-spin text-gray-400" size={32} />
+//                 </div>
+//               ) : availableImages.length === 0 ? (
+//                 <p className="col-span-3 text-center text-gray-500 py-8">
+//                   No images found in{" "}
+//                   <code className="bg-gray-100 px-1 rounded">
+//                     /public/assets/cars/
+//                   </code>
+//                   .<br />
+//                   Push images to GitHub first.
+//                 </p>
+//               ) : (
+//                 availableImages.map((imgPath) => {
+//                   const selected = form.images.includes(imgPath);
+//                   return (
+//                     <div
+//                       key={imgPath}
+//                       onClick={() => toggleImageSelection(imgPath)}
+//                       className={`relative cursor-pointer rounded-lg overflow-hidden border-4 transition-all ${
+//                         selected
+//                           ? "border-blue-500"
+//                           : "border-transparent hover:border-gray-300"
+//                       }`}
+//                     >
+//                       <Image
+//                         src={imgPath}
+//                         width={200}
+//                         height={120}
+//                         alt={imgPath}
+//                         className="object-cover w-full h-28"
+//                       />
+//                       {selected && (
+//                         <span className="absolute top-1 right-1 bg-blue-600 text-white text-xs px-2 py-0.5 rounded">
+//                           ✓
+//                         </span>
+//                       )}
+//                       <p className="text-xs text-gray-500 truncate px-1 py-1">
+//                         {imgPath.split("/").pop()}
+//                       </p>
+//                     </div>
+//                   );
+//                 })
+//               )}
+//             </div>
+
+//             <div className="p-4 border-t flex items-center justify-between">
+//               <p className="text-sm text-gray-500">
+//                 {form.images.length} image
+//                 {form.images.length !== 1 ? "s" : ""} selected
+//               </p>
+//               <button
+//                 type="button"
+//                 onClick={() => setShowPicker(false)}
+//                 className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-xl font-semibold"
+//               >
+//                 Done
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-md p-8 space-y-8">
 //         <h1 className="text-3xl font-bold">Add New Car</h1>
 
 //         <form onSubmit={handleSubmit} className="space-y-6">
-//           {/* SAME UI INPUTS */}
-//           <div className="grid md:grid-cols-2 gap-4">
-//             <Input name="name" placeholder="Car Name" />
-//             <Input name="brand" placeholder="Brand" />
+//           {/* NAME + BRAND */}
+//           <div className="grid md:grid-cols-2 gap-6">
+//             <div>
+//               <input
+//                 name="name"
+//                 placeholder="Car Name"
+//                 value={form.name}
+//                 onChange={handleChange}
+//                 className={inputClass("name")}
+//               />
+//               {errors.name && (
+//                 <p className="text-red-500 text-sm">{errors.name}</p>
+//               )}
+//             </div>
+//             <div>
+//               <input
+//                 name="brand"
+//                 placeholder="Brand"
+//                 value={form.brand}
+//                 onChange={handleChange}
+//                 className={inputClass("brand")}
+//               />
+//               {errors.brand && (
+//                 <p className="text-red-500 text-sm">{errors.brand}</p>
+//               )}
+//             </div>
 //           </div>
 
-//           <div className="grid md:grid-cols-3 gap-4">
-//             <Input name="price" placeholder="Price" />
-//             <Input name="year" placeholder="Year" />
-//             <Input name="mileage" placeholder="Mileage" />
+//           {/* PRICE YEAR MILEAGE */}
+//           <div className="grid md:grid-cols-3 gap-6">
+//             <div>
+//               <input
+//                 name="price"
+//                 placeholder="Price"
+//                 value={form.price}
+//                 onChange={handleChange}
+//                 className={inputClass("price")}
+//               />
+//               {errors.price && (
+//                 <p className="text-red-500 text-sm">{errors.price}</p>
+//               )}
+//             </div>
+//             <div>
+//               <input
+//                 name="year"
+//                 placeholder="Year"
+//                 value={form.year}
+//                 onChange={handleChange}
+//                 className={inputClass("year")}
+//               />
+//               {errors.year && (
+//                 <p className="text-red-500 text-sm">{errors.year}</p>
+//               )}
+//             </div>
+//             <input
+//               name="mileage"
+//               placeholder="Mileage"
+//               value={form.mileage}
+//               onChange={handleChange}
+//               className={inputClass("mileage")}
+//             />
 //           </div>
 
-//           {/* SELECTS SAME STYLE */}
-//           <div className="grid md:grid-cols-3 gap-4">
-//             <select
-//               name="category"
-//               value={form.category}
-//               onChange={handleChange}
-//               className="input"
-//             >
-//               <option>Sedan</option>
-//               <option>SUV</option>
-//               <option>Pickup</option>
-//               <option>Hatchback</option>
-//               <option>Van</option>
-//             </select>
+//           {/* SELECTS */}
+//           <select
+//             name="category"
+//             value={form.category}
+//             onChange={handleChange}
+//             className={inputClass("category")}
+//           >
+//             <option>Sedan</option>
+//             <option>SUV</option>
+//             <option>Pick-up</option>
+//             <option>Hatchback</option>
+//             <option>Van</option>
+//             <option>Crossover</option>
+//             <option>Off-roader</option>
+//             <option>Coupe</option>
+//           </select>
 
-//             <select
-//               name="fuelType"
-//               value={form.fuelType}
-//               onChange={handleChange}
-//               className="input"
-//             >
-//               <option>Petrol</option>
-//               <option>Diesel</option>
-//               <option>Hybrid</option>
-//               <option>Electric</option>
-//             </select>
+//           <select
+//             name="fuelType"
+//             value={form.fuelType}
+//             onChange={handleChange}
+//             className={inputClass("fuelType")}
+//           >
+//             <option>Petrol</option>
+//             <option>Diesel</option>
+//             <option>Hybrid</option>
+//             <option>Electric</option>
+//           </select>
 
-//             <select
-//               name="transmission"
-//               value={form.transmission}
-//               onChange={handleChange}
-//               className="input"
-//             >
-//               <option>Automatic</option>
-//               <option>Manual</option>
-//             </select>
-//           </div>
+//           <select
+//             name="transmission"
+//             value={form.transmission}
+//             onChange={handleChange}
+//             className={inputClass("transmission")}
+//           >
+//             <option>Automatic</option>
+//             <option>Manual</option>
+//           </select>
 
+//           <select
+//             name="status"
+//             value={form.status}
+//             onChange={handleChange}
+//             className={inputClass("status")}
+//           >
+//             <option>Available</option>
+//             <option>Sold</option>
+//           </select>
+
+//           {/* DESCRIPTION */}
 //           <textarea
 //             name="description"
+//             placeholder="Description"
 //             value={form.description}
 //             onChange={handleChange}
-//             placeholder="Description"
-//             className="input h-28"
+//             rows={4}
+//             className={inputClass("description")}
 //           />
 
-//           {errors.images && <p className="text-red-500">{errors.images}</p>}
-
-//           {/* UPLOAD */}
-//           <div className="border-2 border-dashed p-6 rounded-xl text-center">
-//             <label className="cursor-pointer flex flex-col items-center gap-2">
-//               {uploading ? (
-//                 <Loader2 className="animate-spin" />
-//               ) : (
-//                 <UploadCloud />
-//               )}
-//               Upload Images
-//               <input type="file" multiple hidden onChange={handleUpload} />
-//             </label>
+//           {/* IMAGE PICKER TRIGGER */}
+//           <div className="border-2 border-dashed rounded-xl p-8 text-center">
+//             <button
+//               type="button"
+//               onClick={openPicker}
+//               className="cursor-pointer flex flex-col items-center gap-2 w-full"
+//             >
+//               <UploadCloud size={40} className="text-gray-400" />
+//               <span className="text-gray-600 font-medium">
+//                 Click to pick images from assets
+//               </span>
+//               <span className="text-gray-400 text-sm">
+//                 Images must be in{" "}
+//                 <code className="bg-gray-100 px-1 rounded">
+//                   public/assets/cars/
+//                 </code>{" "}
+//                 — push via Git first
+//               </span>
+//             </button>
+//             {errors.images && (
+//               <p className="text-red-500 text-sm mt-2">{errors.images}</p>
+//             )}
 //           </div>
 
-//           {/* IMAGES */}
-//           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-//             {form.images.map((img, i) => (
-//               <div
-//                 key={img.public_id}
-//                 className="relative cursor-pointer"
-//                 onClick={() => setThumbnail(img)}
-//               >
-//                 <Image
-//                   src={img.url}
-//                   width={200}
-//                   height={120}
-//                   className="rounded-lg object-cover"
-//                   alt="car"
-//                 />
-
-//                 <button
-//                   type="button"
-//                   onClick={(e) => {
-//                     e.stopPropagation();
-//                     deleteImage(img);
-//                   }}
-//                   className="absolute top-2 right-2 bg-white p-1 rounded"
+//           {/* SELECTED IMAGES PREVIEW */}
+//           {form.images.length > 0 && (
+//             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+//               {form.images.map((img, i) => (
+//                 <div
+//                   key={img}
+//                   className={`relative rounded-xl overflow-hidden cursor-pointer ${
+//                     i === 0
+//                       ? "ring-4 ring-blue-500"
+//                       : "hover:ring-2 hover:ring-gray-300"
+//                   }`}
+//                   onClick={() => setThumbnail(img)}
 //                 >
-//                   <X size={14} />
-//                 </button>
+//                   <Image
+//                     src={img}
+//                     alt="car"
+//                     width={300}
+//                     height={200}
+//                     className="w-full h-32 object-cover"
+//                   />
+//                   {i === 0 && (
+//                     <span className="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-0.5 rounded">
+//                       Thumbnail
+//                     </span>
+//                   )}
+//                   <button
+//                     type="button"
+//                     onClick={(e) => {
+//                       e.stopPropagation();
+//                       deleteImage(img);
+//                     }}
+//                     className="absolute top-2 right-2 bg-white p-1 rounded-full shadow"
+//                   >
+//                     <X size={16} />
+//                   </button>
+//                 </div>
+//               ))}
+//             </div>
+//           )}
 
-//                 {i === 0 && (
-//                   <span className="absolute bottom-1 left-1 text-xs bg-blue-500 text-white px-2 rounded">
-//                     Thumb
-//                   </span>
-//                 )}
-//               </div>
-//             ))}
-//           </div>
-
+//           {/* SUBMIT */}
 //           <button
-//             disabled={saving}
-//             className="w-full bg-red-500 text-white py-3 rounded-xl"
+//             type="submit"
+//             disabled={!isFormValid || saving}
+//             className={`w-full py-3 rounded-xl font-semibold transition ${
+//               !isFormValid || saving
+//                 ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                 : "bg-red-500 text-white hover:bg-red-600"
+//             }`}
 //           >
-//             {saving ? "Saving..." : "Create Car"}
+//             {saving ? "Creating..." : "Create Car"}
 //           </button>
 //         </form>
 //       </div>
-
-//       <style jsx>{`
-//         .input {
-//           width: 100%;
-//           padding: 12px;
-//           border-radius: 10px;
-//           border: 1px solid #e5e7eb;
-//           transition: 0.2s;
-//         }
-
-//         .input:focus {
-//           outline: none;
-//           border-color: #ef4444;
-//         }
-//       `}</style>
 //     </main>
 //   );
 // }
-
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { UploadCloud, Loader2, X } from "lucide-react";
+import {
+  UploadCloud,
+  Loader2,
+  X,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+
+const IMAGES_PER_PAGE = 6; // 2 rows × 3 cols — full image visible, easy to browse
 
 export default function CreateCarPage() {
   const router = useRouter();
 
-  const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
-
   const [toast, setToast] = useState({
     show: false,
     message: "",
     type: "success",
   });
-
   const [errors, setErrors] = useState({});
 
   const showToast = (message, type = "success") => {
     setToast({ show: true, message, type });
-
-    setTimeout(() => {
-      setToast({ show: false, message: "", type: "success" });
-    }, 3500);
+    setTimeout(
+      () => setToast({ show: false, message: "", type: "success" }),
+      3500,
+    );
   };
 
   const [form, setForm] = useState({
@@ -1479,29 +550,73 @@ export default function CreateCarPage() {
     images: [],
   });
 
+  // ================= IMAGE PICKER =================
+  const [availableImages, setAvailableImages] = useState([]);
+  const [showPicker, setShowPicker] = useState(false);
+  const [loadingImages, setLoadingImages] = useState(false);
+  const [pickerPage, setPickerPage] = useState(1);
+
+  const totalPages = Math.ceil(availableImages.length / IMAGES_PER_PAGE);
+  const pagedImages = availableImages.slice(
+    (pickerPage - 1) * IMAGES_PER_PAGE,
+    pickerPage * IMAGES_PER_PAGE,
+  );
+
+  const openPicker = async () => {
+    setLoadingImages(true);
+    setShowPicker(true);
+    setPickerPage(1);
+    try {
+      const res = await fetch("/api/upload");
+      const data = await res.json();
+      setAvailableImages(data.images || []);
+    } catch (err) {
+      showToast("Failed to load images", "error");
+      setShowPicker(false);
+    } finally {
+      setLoadingImages(false);
+    }
+  };
+
+  const toggleImageSelection = (imgPath) => {
+    setForm((prev) => {
+      const already = prev.images.includes(imgPath);
+      const updated = already
+        ? prev.images.filter((i) => i !== imgPath)
+        : [...prev.images, imgPath];
+      setErrors((e) => ({ ...e, images: updated.length ? "" : e.images }));
+      return { ...prev, images: updated };
+    });
+  };
+
+  const setThumbnail = (img) => {
+    setForm((prev) => ({
+      ...prev,
+      images: [img, ...prev.images.filter((i) => i !== img)],
+    }));
+  };
+
+  const deleteImage = (img) => {
+    setForm((prev) => ({
+      ...prev,
+      images: prev.images.filter((i) => i !== img),
+    }));
+  };
+
   // ================= VALIDATION =================
   const validate = () => {
     const newErrors = {};
-
     if (!form.name.trim()) newErrors.name = "Car name is required";
     if (!form.brand.trim()) newErrors.brand = "Brand is required";
     if (!form.category) newErrors.category = "Category is required";
-
-    if (!form.price || isNaN(Number(form.price.replace(/,/g, "")))) {
+    if (!form.price || isNaN(Number(form.price.replace(/,/g, ""))))
       newErrors.price = "Valid price is required";
-    }
-
-    if (!form.year || isNaN(Number(form.year))) {
+    if (!form.year || isNaN(Number(form.year)))
       newErrors.year = "Valid year is required";
-    }
-
     if (!form.fuelType) newErrors.fuelType = "Fuel type is required";
     if (!form.transmission) newErrors.transmission = "Transmission required";
-
-    if (form.images.length === 0) {
+    if (form.images.length === 0)
       newErrors.images = "At least one image is required";
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -1509,37 +624,18 @@ export default function CreateCarPage() {
   // ================= HANDLE CHANGE =================
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setErrors((prev) => ({ ...prev, [name]: "" }));
 
-    // PRICE FORMAT
-    if (name === "price") {
+    if (name === "price" || name === "mileage") {
       const raw = value.replace(/,/g, "");
       if (!raw) {
-        setForm({ ...form, price: "" });
+        setForm({ ...form, [name]: "" });
         return;
       }
-
-      if (!isNaN(raw)) {
-        setForm({ ...form, price: Number(raw).toLocaleString() });
-      }
+      if (!isNaN(raw))
+        setForm({ ...form, [name]: Number(raw).toLocaleString() });
       return;
     }
-
-    // MILEAGE FORMAT
-    if (name === "mileage") {
-      const raw = value.replace(/,/g, "");
-      if (!raw) {
-        setForm({ ...form, mileage: "" });
-        return;
-      }
-
-      if (!isNaN(raw)) {
-        setForm({ ...form, mileage: Number(raw).toLocaleString() });
-      }
-      return;
-    }
-
     setForm({ ...form, [name]: value });
   };
 
@@ -1555,69 +651,14 @@ export default function CreateCarPage() {
     form.transmission &&
     form.images.length > 0;
 
-  // ================= IMAGE UPLOAD =================
-  const handleUpload = async (e) => {
-    try {
-      const files = Array.from(e.target.files || []);
-
-      if (!files.length) {
-        showToast("No files selected", "error");
-        return;
-      }
-
-      setUploading(true);
-
-      const formData = new FormData();
-      files.forEach((file) => formData.append("files", file));
-
-      const res = await fetch("/admin/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) throw new Error("Upload failed");
-
-      const data = await res.json();
-
-      setForm((prev) => ({
-        ...prev,
-        images: [...prev.images, ...data.urls],
-      }));
-
-      showToast("Images uploaded successfully");
-      setErrors((prev) => ({ ...prev, images: "" }));
-    } catch (err) {
-      showToast(err.message || "Upload failed", "error");
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const setThumbnail = (img) => {
-    setForm((prev) => {
-      const rest = prev.images.filter((i) => i.public_id !== img.public_id);
-      return { ...prev, images: [img, ...rest] };
-    });
-  };
-
-  const deleteImage = (img) => {
-    setForm((prev) => ({
-      ...prev,
-      images: prev.images.filter((i) => i.public_id !== img.public_id),
-    }));
-  };
-
   // ================= SUBMIT =================
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validate()) {
       showToast("Please fix form errors", "error");
       return;
     }
-
     setSaving(true);
-
     try {
       const res = await fetch("/api/admin/cars", {
         method: "POST",
@@ -1629,14 +670,9 @@ export default function CreateCarPage() {
           mileage: Number(form.mileage?.replace(/,/g, "") || 0),
         }),
       });
-
       const data = await res.json();
-
-      if (!res.ok || !data?.success) {
-        const backendError = data?.error || "Failed to create car";
-        throw new Error(backendError);
-      }
-
+      if (!res.ok || !data?.success)
+        throw new Error(data?.error || "Failed to create car");
       showToast("🚗 Car created successfully!");
       router.push("/admin/cars");
     } catch (err) {
@@ -1646,7 +682,6 @@ export default function CreateCarPage() {
     }
   };
 
-  // ================= INPUT CLASS =================
   const inputClass = (field) =>
     `w-full p-3 rounded-lg border text-slate-600 ${
       errors[field] ? "border-red-500" : "border-gray-200"
@@ -1665,11 +700,179 @@ export default function CreateCarPage() {
         </div>
       )}
 
+      {/* IMAGE PICKER MODAL */}
+      {showPicker && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div
+            className="bg-white rounded-2xl shadow-xl w-full max-w-2xl flex flex-col"
+            style={{ maxHeight: "85vh" }}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b shrink-0">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-800">
+                  Pick Images
+                </h2>
+                {availableImages.length > 0 && (
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    {availableImages.length} image
+                    {availableImages.length !== 1 ? "s" : ""} available
+                    {form.images.length > 0 &&
+                      ` · ${form.images.length} selected`}
+                  </p>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowPicker(false)}
+                className="text-gray-400 hover:text-gray-700 transition"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Grid — fixed height so images are fully visible */}
+            <div
+              className="p-4 overflow-y-auto shrink-0"
+              style={{ height: "380px" }}
+            >
+              {loadingImages ? (
+                <div className="flex justify-center items-center h-full">
+                  <Loader2 className="animate-spin text-gray-400" size={32} />
+                </div>
+              ) : availableImages.length === 0 ? (
+                <div className="flex flex-col justify-center items-center h-full text-center text-gray-500 gap-2">
+                  <UploadCloud size={36} className="text-gray-300" />
+                  <p>
+                    No images found in{" "}
+                    <code className="bg-gray-100 px-1 rounded">
+                      /public/assets/cars/
+                    </code>
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    Push images to GitHub first.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-3 gap-3">
+                  {pagedImages.map((imgPath) => {
+                    const selected = form.images.includes(imgPath);
+                    const isThumb = form.images[0] === imgPath;
+                    return (
+                      <div
+                        key={imgPath}
+                        onClick={() => toggleImageSelection(imgPath)}
+                        className={`relative cursor-pointer rounded-xl overflow-hidden border-2 transition-all ${
+                          selected
+                            ? "border-blue-500 shadow-md"
+                            : "border-transparent hover:border-gray-300"
+                        }`}
+                      >
+                        {/* Fixed-height image — always fully visible */}
+                        <div
+                          className="relative w-full"
+                          style={{ height: "110px" }}
+                        >
+                          <Image
+                            src={imgPath}
+                            fill
+                            alt={imgPath.split("/").pop()}
+                            className="object-cover"
+                            sizes="200px"
+                          />
+                        </div>
+
+                        {/* Badges */}
+                        {selected && (
+                          <span className="absolute top-1.5 right-1.5 bg-blue-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold shadow">
+                            ✓
+                          </span>
+                        )}
+                        {isThumb && (
+                          <span className="absolute top-1.5 left-1.5 bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded font-medium shadow">
+                            Thumb
+                          </span>
+                        )}
+
+                        {/* Filename */}
+                        <p className="text-xs text-gray-500 truncate px-2 py-1 bg-white">
+                          {imgPath.split("/").pop()}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-3 px-4 py-3 border-t shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setPickerPage((p) => Math.max(1, p - 1))}
+                  disabled={pickerPage === 1}
+                  className="p-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+
+                {/* Page number pills */}
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (page) => (
+                      <button
+                        key={page}
+                        type="button"
+                        onClick={() => setPickerPage(page)}
+                        className={`w-7 h-7 rounded-lg text-sm font-medium transition ${
+                          page === pickerPage
+                            ? "bg-red-500 text-white"
+                            : "text-gray-500 hover:bg-gray-100"
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ),
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setPickerPage((p) => Math.min(totalPages, p + 1))
+                  }
+                  disabled={pickerPage === totalPages}
+                  className="p-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            )}
+
+            {/* Footer */}
+            <div className="p-4 border-t flex items-center justify-between shrink-0">
+              <p className="text-sm text-gray-500">
+                {form.images.length} image{form.images.length !== 1 ? "s" : ""}{" "}
+                selected
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowPicker(false)}
+                className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-xl font-semibold transition"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= MAIN FORM ================= */}
       <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-md p-8 space-y-8">
         <h1 className="text-3xl font-bold">Add New Car</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* NAME + BRAND */}
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <input
@@ -1683,7 +886,6 @@ export default function CreateCarPage() {
                 <p className="text-red-500 text-sm">{errors.name}</p>
               )}
             </div>
-
             <div>
               <input
                 name="brand"
@@ -1698,7 +900,6 @@ export default function CreateCarPage() {
             </div>
           </div>
 
-          {/* PRICE YEAR MILEAGE */}
           <div className="grid md:grid-cols-3 gap-6">
             <div>
               <input
@@ -1712,7 +913,6 @@ export default function CreateCarPage() {
                 <p className="text-red-500 text-sm">{errors.price}</p>
               )}
             </div>
-
             <div>
               <input
                 name="year"
@@ -1725,7 +925,6 @@ export default function CreateCarPage() {
                 <p className="text-red-500 text-sm">{errors.year}</p>
               )}
             </div>
-
             <input
               name="mileage"
               placeholder="Mileage"
@@ -1735,7 +934,6 @@ export default function CreateCarPage() {
             />
           </div>
 
-          {/* SELECTS */}
           <select
             name="category"
             value={form.category}
@@ -1744,9 +942,12 @@ export default function CreateCarPage() {
           >
             <option>Sedan</option>
             <option>SUV</option>
-            <option>Pickup</option>
+            <option>Pick-up</option>
             <option>Hatchback</option>
             <option>Van</option>
+            <option>Crossover</option>
+            <option>Off-roader</option>
+            <option>Coupe</option>
           </select>
 
           <select
@@ -1771,7 +972,6 @@ export default function CreateCarPage() {
             <option>Manual</option>
           </select>
 
-          {/* STATUS */}
           <select
             name="status"
             value={form.status}
@@ -1782,7 +982,6 @@ export default function CreateCarPage() {
             <option>Sold</option>
           </select>
 
-          {/* DESCRIPTION */}
           <textarea
             name="description"
             placeholder="Description"
@@ -1792,58 +991,70 @@ export default function CreateCarPage() {
             className={inputClass("description")}
           />
 
-          {/* UPLOAD */}
+          {/* IMAGE PICKER TRIGGER */}
           <div className="border-2 border-dashed rounded-xl p-8 text-center">
-            <label className="cursor-pointer flex flex-col items-center gap-2">
-              {uploading ? (
-                <>
-                  <Loader2 className="animate-spin" />
-                  Uploading...
-                </>
-              ) : (
-                <>
-                  <UploadCloud size={40} />
-                  Upload Images
-                </>
-              )}
-              <input type="file" multiple onChange={handleUpload} hidden />
-            </label>
+            <button
+              type="button"
+              onClick={openPicker}
+              className="cursor-pointer flex flex-col items-center gap-2 w-full"
+            >
+              <UploadCloud size={40} className="text-gray-400" />
+              <span className="text-gray-600 font-medium">
+                Click to pick images from assets
+              </span>
+              <span className="text-gray-400 text-sm">
+                Images must be in{" "}
+                <code className="bg-gray-100 px-1 rounded">
+                  public/assets/cars/
+                </code>{" "}
+                — push via Git first
+              </span>
+            </button>
             {errors.images && (
               <p className="text-red-500 text-sm mt-2">{errors.images}</p>
             )}
           </div>
 
-          {/* IMAGES */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {form.images.map((img, i) => (
-              <div
-                key={img.public_id}
-                className="relative rounded-xl overflow-hidden"
-                onClick={() => setThumbnail(img)}
-              >
-                <Image
-                  src={img.url}
-                  alt="car"
-                  width={300}
-                  height={200}
-                  className="w-full h-32 object-cover"
-                />
-
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    deleteImage(img);
-                  }}
-                  className="absolute top-2 right-2 bg-white p-1 rounded-full"
+          {/* SELECTED IMAGES PREVIEW */}
+          {form.images.length > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {form.images.map((img, i) => (
+                <div
+                  key={img}
+                  className={`relative rounded-xl overflow-hidden cursor-pointer ${
+                    i === 0
+                      ? "ring-4 ring-blue-500"
+                      : "hover:ring-2 hover:ring-gray-300"
+                  }`}
+                  onClick={() => setThumbnail(img)}
                 >
-                  <X size={16} />
-                </button>
-              </div>
-            ))}
-          </div>
+                  <Image
+                    src={img}
+                    alt="car"
+                    width={300}
+                    height={200}
+                    className="w-full h-32 object-cover"
+                  />
+                  {i === 0 && (
+                    <span className="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-0.5 rounded">
+                      Thumbnail
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteImage(img);
+                    }}
+                    className="absolute top-2 right-2 bg-white p-1 rounded-full shadow"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
 
-          {/* SUBMIT */}
           <button
             type="submit"
             disabled={!isFormValid || saving}
