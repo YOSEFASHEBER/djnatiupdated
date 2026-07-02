@@ -144,7 +144,10 @@ export default function FiltersSidebar({ searchParams, updateParams }) {
           <option value="">All Categories</option>
           <option value="SUV">SUV</option>
           <option value="Sedan">Sedan</option>
-          <option value="Truck">Truck</option>
+          <option value="Pick-up">Pick-up</option>
+          <option value="Van">Van</option>
+          <option value="Hatchback">Hatchback</option>
+          <option value="Off-roader">Off-roader</option>
         </select>
 
         {/* Min Price */}

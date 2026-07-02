@@ -188,14 +188,12 @@ export default function CarsClient({ initialData }) {
               className="w-full p-2 border rounded-xl focus:ring-2 focus:ring-red-500 outline-none text-slate-600"
             >
               <option value="">All Categories</option>
-              <option>Sedan</option>
-              <option>SUV</option>
-              <option>Pick-up</option>
-              <option>Hatchback</option>
-              <option>Van</option>
-              <option>Crossover</option>
-              <option>Off-roader</option>
-              <option>Coupe</option>
+              <option value="SUV">SUV</option>
+              <option value="Sedan">Sedan</option>
+              <option value="Pick-up">Pick-up</option>
+              <option value="Van">Van</option>
+              <option value="Hatchback">Hatchback</option>
+              <option value="Off-roader">Off-roader</option>
             </select>
 
             <select
@@ -278,11 +276,12 @@ export default function CarsClient({ initialData }) {
                 className="w-full p-2 border rounded-xl mb-4 text-slate-600"
               >
                 <option value="">All Categories</option>
-                <option>SUV</option>
-                <option>Sedan</option>
-                <option>Hatchback</option>
-                <option>Truck</option>
-                <option>Van</option>
+                <option value="SUV">SUV</option>
+                <option value="Sedan">Sedan</option>
+                <option value="Pick-up">Pick-up</option>
+                <option value="Van">Van</option>
+                <option value="Hatchback">Hatchback</option>
+                <option value="Off-roader">Off-roader</option>
               </select>
 
               <select
